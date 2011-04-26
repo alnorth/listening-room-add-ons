@@ -1,0 +1,115 @@
+<div id="addons_lightbox_dimmer"></div>
+<div id="addons_settings">
+	<h3>Add-ons Settings</h3>
+	<div id="addons_settings_div">
+		<h4>General</h4>
+		<table>
+			<tr>
+				<td><label for="addons_settings_hidechat">Hide chat:</label></td>
+				<td><input type="checkbox" id="addons_settings_hidechat"/></td>
+			</tr>
+			<tr>
+				<td><label for="addons_settings_showuploader">Show each track's uploader:</label></td>
+				<td><input type="checkbox" id="addons_settings_showuploader"/></td>
+			</tr>
+			<tr>
+				<td><label for="addons_settings_albumart">Fetch album art for tracks with missing art:</label></td>
+				<td><input type="checkbox" id="addons_settings_albumart"/></td>
+			</tr>
+		</table>
+		<h4>Last.fm</h4>
+		<table>
+			<tr>
+				<td><label for="addons_settings_scrobble">Scrobble tracks:</label></td>
+				<td><input type="checkbox" id="addons_settings_scrobble"/></td>
+			</tr>
+			<tr>
+				<td><label for="addons_settings_showscrobblestatus">Show track's scrobble status:</label></td>
+				<td><input type="checkbox" id="addons_settings_showscrobblestatus"/></td>
+			</tr>
+			<tr>
+				<td><label for="addons_settings_lastfmlink">Show link to track:</label></td>
+				<td><input type="checkbox" id="addons_settings_lastfmlink"/></td>
+			</tr>
+			<tr>
+				<td><label for="addons_settings_showlastfmlovebutton">Show love button:</label></td>
+				<td><input type="checkbox" id="addons_settings_showlastfmlovebutton"/></td>
+			</tr>
+		</table>
+	</div>
+	<input type="button" value="Save" id="addons_settings_save" />
+	<a id="addons_settings_cancel" href="javascript:void(0);">Cancel</a>
+</div>
+<div id="addons_lastfmlogin">
+	<h3>Log in to Last.fm</h3>
+	<table>
+		<tr>
+			<td>Username:</td>
+			<td><input id="addons_lastfm_username" onkeypress="var k=event.keyCode||event.which;if(k==13){document.getElementById('addons_lastfm_button').click();}"/></td>
+		</tr>
+		<tr>
+			<td>Password:</td>
+			<td><input id="addons_lastfm_password" type="password" onkeypress="var k=event.keyCode||event.which;if(k==13){document.getElementById('addons_lastfm_button').click();}"/></td>
+		</tr>
+	</table>
+	<input type="button" value="Log in" id="addons_lastfm_button" />
+	<a id="addons_lastfm_cancel" href="javascript:void(0);">Don't log in</a>
+</div>
+<div id="addons_changelog">
+	<h3>Add-ons Change Log</h3>
+	<div id="addons_changelog_div">
+		<h4>0.4.3</h4>
+		<ul>
+			<li>Modifications to the Last.fm library to make album art loading more reliable</li>
+		</ul>
+		<h4>0.4.2</h4>
+		<ul>
+			<li>Updated icons from @blatantsubtext</li>
+		</ul>
+		<h4>0.4.1</h4>
+		<ul>
+			<li>Fixed a bug that stopped track data updating if you had another tab selected</li>
+		</ul>
+		<h4>0.4</h4>
+		<ul>
+			<li>Uploader's name can now be displayed next to tracks</li>
+			<li>Use album art from Last.fm if there was none in the uploaded file</li>
+			<li>Updated Last.fm track link button from @blatantsubtext</li>
+			<li>Added cancel option to Last.fm log in dialog</li>
+			<li>Remove old data from the extension's database</li>
+			<li>Resolve an issue that could cause the love button to reappear after it had been clicked</li>
+		</ul>
+		<h4>0.3.1</h4>
+		<ul>
+			<li>Added new icon designs from @blatantsubtext</li>
+			<li>Added popup text on icons</li>
+		</ul>
+		<h4>0.3</h4>
+		<ul>
+			<li>Add the ability to hide chat</li>
+			<li>Fixed a bug with Last.fm track links</li>
+		</ul>
+		<h4>0.2.2</h4>
+		<ul>
+			<li>Default scrobbling to on</li>
+		</ul>
+		<h4>0.2.1</h4>
+		<ul>
+			<li>Small SQL fix</li>
+		</ul>
+		<h4>0.2</h4>
+		<ul>
+			<li>Settings area</li>
+			<li>Ability to disable scrobbling</li>
+			<li>Last.fm log in box submits when enter is pressed</li>
+			<li>Link to track on Last.fm</li>
+			<li>Visible scrobble status on tracks</li>
+			<li>Button to "love" tracks on Last.fm</li>
+		</ul>
+		<h4>0.1</h4>
+		<ul>
+			<li>Simple scrobbling support</li>
+		</ul>
+	</div>
+	<a id="addons_changelog_close" href="javascript:void(0);">Close</a>
+</div>
