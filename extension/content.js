@@ -71,6 +71,7 @@ function saveSettings() {
 	settings.hidechat = document.getElementById("addons_settings_hidechat").checked;
 	settings.showuploader = document.getElementById("addons_settings_showuploader").checked;
 	settings.albumart = document.getElementById("addons_settings_albumart").checked;
+	settings.twitterusernamelinks = document.getElementById("addons_settings_twitterusernamelinks").checked;
 	
 	settings.scrobble = document.getElementById("addons_settings_scrobble").checked;
 	settings.showscrobblestatus = document.getElementById("addons_settings_showscrobblestatus").checked;
@@ -82,6 +83,7 @@ function saveSettings() {
 	updateAllTrackData();
 	applyChatHidden();
 	removeRecordImagesIfNecessary();
+	removeTwitterLinksIfNecessary();
 }
 
 function loadSettings() {
@@ -89,6 +91,7 @@ function loadSettings() {
 		document.getElementById("addons_settings_hidechat").checked = newSettings.hidechat;
 		document.getElementById("addons_settings_showuploader").checked = newSettings.showuploader;
 		document.getElementById("addons_settings_albumart").checked = newSettings.albumart;
+		document.getElementById("addons_settings_twitterusernamelinks").checked = newSettings.twitterusernamelinks;
 		
 		document.getElementById("addons_settings_scrobble").checked = newSettings.scrobble;
 		document.getElementById("addons_settings_showscrobblestatus").checked = newSettings.showscrobblestatus;
@@ -287,8 +290,30 @@ function addTrackDataDiv(html, track, opt_userP) {
 	return html;
 }
 
+function linkifyTwitterNames() {
+	if(settings.twitterusernamelinks) {
+		$(".username:not(.addons_username)").each(function(index){
+			$(this).addClass("addons_username");
+			var username = this.innerHTML;
+			this.dataset.username = username;
+			var twitterUrl = "http://www.twitter.com/"+ username;
+			this.innerHTML = "<a href=\""+ twitterUrl +"\" target=\"_blank\">" + username + "</a>";
+		});
+	}
+}
+
+function removeTwitterLinksIfNecessary() {
+	if(!settings.twitterusernamelinks) {
+		$(".username.addons_username").each(function(index){
+			$(this).removeClass("addons_username");
+			this.innerHTML = this.dataset.username;
+		});
+	}
+}
+
 function pulse() {
 	checkForNewTrack();
+	linkifyTwitterNames();
 }
 
 function slowPulse() {
