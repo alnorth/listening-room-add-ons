@@ -1,7 +1,7 @@
 {
 	"name": "Listening Room Add-ons",
 	"version": "0.5",
-	"description": "Some extra features for Listening Room. Managed by @alasdairnorth.",
+	"description": "UI enhancements and scrobbling for Listening Room. Managed by @alasdairnorth.",
 	"background_page": "background.html",
 	"content_scripts": [
 		{
