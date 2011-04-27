@@ -10,8 +10,6 @@ function LastFM(options){
 	var apiSecret = options.apiSecret || '';
 	var apiUrl    = options.apiUrl    || 'http://ws.audioscrobbler.com/2.0/';
 	var cache     = options.cache     || undefined;
-	
-	var jsonpCallbackCount = 0;
 
 	/* Set API key. */
 	this.setApiKey = function(_apiKey){
@@ -32,6 +30,9 @@ function LastFM(options){
 	this.setCache = function(_cache){
 		cache = _cache;
 	};
+
+	/* Set the JSONP callback identifier counter. This is used to ensure the callbacks are unique */
+	var jsonpCounter = 0;
 
 	/* Internal call (POST, GET). */
 	var internalCall = function(params, callbacks, requestMethod){
@@ -92,8 +93,10 @@ function LastFM(options){
 		/* Cross-domain GET request (JSONP). */
 		else{
 			/* Get JSONP callback name. */
-			jsonpCallbackCount++;
-			var jsonp = 'lfmJsonp' + jsonpCallbackCount;
+			var jsonp = 'jsonp' + new Date().getTime() + jsonpCounter;
+
+			/* Update the unique JSONP callback counter */
+			jsonpCounter += 1;
 
 			/* Calculate cache hash. */
 			var hash = auth.getApiSignature(params);
