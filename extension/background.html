@@ -245,6 +245,7 @@
 			window.localStorage.setItem("hidechat", settings.hidechat ? "true" : "false");
 			window.localStorage.setItem("showuploader", settings.showuploader ? "true" : "false");
 			window.localStorage.setItem("albumart", settings.albumart ? "true" : "false");
+			window.localStorage.setItem("twitterusernamelinks", settings.twitterusernamelinks ? "true" : "false");
 			
 			window.localStorage.setItem("scrobble", settings.scrobble ? "true" : "false");
 			window.localStorage.setItem("showscrobblestatus", settings.showscrobblestatus ? "true" : "false");
@@ -264,6 +265,8 @@
 			settings.showuploader = (!showuploader || showuploader == "true");
 			var albumart = window.localStorage.getItem("albumart");
 			settings.albumart = (!albumart || albumart == "true");
+			var twitterusernamelinks = window.localStorage.getItem("twitterusernamelinks");
+			settings.twitterusernamelinks = (!twitterusernamelinks || twitterusernamelinks == "true");
 			
 			var scrobble = window.localStorage.getItem("scrobble");
 			settings.scrobble = (!scrobble || scrobble == "true");
