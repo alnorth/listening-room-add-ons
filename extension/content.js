@@ -196,9 +196,9 @@ function updateSingleTrackData(trackId, el) {
 			setRecordImage(trackId, resizedImage(190, trackInfo.albumArt));
 		}
 		if(settings.showuploader) {
-			var user = getUser(track.userId);
-			if(user != undefined) {
-				trackDataHtml += '<div class="addons_uploader">Uploaded by <span class="username">'+ user.name +'</span></div>';
+			var user = trackInfo.user;
+			if(user != undefined && user != "") {
+				trackDataHtml += '<div class="addons_uploader">Uploaded by <span class="username">'+ user +'</span></div>';
 			} else {
 				trackDataHtml += '<div class="addons_uploader">Uploader has now left the room</div>';
 			}

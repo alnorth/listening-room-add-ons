@@ -130,7 +130,7 @@
 		function getTrackInfo(trackId, fetchMissingData, callback) {
 			db.transaction(function(tx) {
 				var info = {};
-				tx.executeSql('select lastfm_status, lastfm_url, lastfm_loved, album_art, title, artist, album from TRACK_PLAY where id = ?', [trackId], function(tx, rs) {
+				tx.executeSql('select lastfm_status, lastfm_url, lastfm_loved, album_art, title, artist, album, user from TRACK_PLAY where id = ?', [trackId], function(tx, rs) {
 					if(rs.rows.length == 1) {
 						var albumArt = rs.rows.item(0)["album_art"];
 						if((!albumArt || albumArt == "") && fetchMissingData) {
@@ -166,6 +166,7 @@
 						}
 						info.lastfmstatus = rs.rows.item(0)["lastfm_status"];
 						info.lastfmloved = (rs.rows.item(0)["lastfm_loved"] == lastfmLovedStatus.LOVE_SENT || rs.rows.item(0)["lastfm_loved"] == lastfmLovedStatus.LOVE_ACKNOWLEDGED);
+						info.user = rs.rows.item(0)["user"];
 						
 						callback(info);
 					} else {
