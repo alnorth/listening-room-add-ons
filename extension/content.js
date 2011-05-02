@@ -58,11 +58,13 @@ function newTrack(id) {
 
 function showSettings() {
 	$("#addons_lightbox_dimmer").show();
+	$("#addons_lightbox_dimmer").click(hideSettings);
 	$("#addons_settings").show();
 }
 
 function hideSettings() {
 	$("#addons_lightbox_dimmer").hide();
+	$("#addons_lightbox_dimmer").unbind('click');
 	$("#addons_settings").hide();
 }
 
@@ -105,14 +107,17 @@ function loadSettings() {
 
 function showChangelog() {
 	$("#addons_lightbox_dimmer").show();
+	$("#addons_lightbox_dimmer").click(hideChangelog);
 	$("#addons_changelog").show();
 }
 
 function hideChangelog() {
 	$("#addons_lightbox_dimmer").hide();
+	$("#addons_lightbox_dimmer").unbind('click');
 	$("#addons_changelog").hide();
 }
 
+// The log in box is different from other pop ups. Clicking outside this box should not cancel it.
 function showLastFmLogin() {
 	$("#addons_lightbox_dimmer").show();
 	$("#addons_lastfmlogin").show();
