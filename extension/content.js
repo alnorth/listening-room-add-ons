@@ -256,7 +256,7 @@ function applyChatHidden() {
 		styleNode = document.createElement("style");
 		$(styleNode).attr("type", "text/css")
 			.attr("id", "addons_css_hidechat")
-			.append("div.annotation {display: none;}");
+			.append("div.annotation {display: none !important;}");
 		$("head").append(styleNode);
 	} else if(!settings.hidechat && styleNode.length) {
 		styleNode.remove();
