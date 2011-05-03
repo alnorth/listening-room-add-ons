@@ -56,15 +56,27 @@ function newTrack(id) {
 	chrome.extension.sendRequest({type: "newtrack", track: trackData}, function(response) {});
 }
 
-function showSettings() {
+function showDimmer(closeFunction) {
 	$("#addons_lightbox_dimmer").show();
-	$("#addons_lightbox_dimmer").click(hideSettings);
+	if(closeFunction) {
+		$("#addons_lightbox_dimmer").click(closeFunction);
+	}
+	$("body").css("overflow", "hidden");
+}
+
+function hideDimmer() {
+	$("#addons_lightbox_dimmer").hide();
+	$("#addons_lightbox_dimmer").unbind('click');
+	$("body").css("overflow", "");
+}
+
+function showSettings() {
+	showDimmer(hideSettings);
 	$("#addons_settings").show();
 }
 
 function hideSettings() {
-	$("#addons_lightbox_dimmer").hide();
-	$("#addons_lightbox_dimmer").unbind('click');
+	hideDimmer();
 	$("#addons_settings").hide();
 }
 
@@ -106,25 +118,23 @@ function loadSettings() {
 }
 
 function showChangelog() {
-	$("#addons_lightbox_dimmer").show();
-	$("#addons_lightbox_dimmer").click(hideChangelog);
+	showDimmer(hideChangelog);
 	$("#addons_changelog").show();
 }
 
 function hideChangelog() {
-	$("#addons_lightbox_dimmer").hide();
-	$("#addons_lightbox_dimmer").unbind('click');
+	hideDimmer();
 	$("#addons_changelog").hide();
 }
 
 // The log in box is different from other pop ups. Clicking outside this box should not cancel it.
 function showLastFmLogin() {
-	$("#addons_lightbox_dimmer").show();
+	showDimmer();
 	$("#addons_lastfmlogin").show();
 }
 
 function hideLastFmLogin() {
-	$("#addons_lightbox_dimmer").hide();
+	hideDimmer();
 	$("#addons_lastfmlogin").hide();
 }
 
