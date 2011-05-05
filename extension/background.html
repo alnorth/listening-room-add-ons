@@ -64,6 +64,12 @@
 				tx.executeSql('update DB_DATA set version = 2', [], ignore, sqlError);
 				currentVersion = 2;
 			}
+			if(currentVersion == 2) {
+				tx.executeSql('alter table TRACK_PLAY add column user_id text', [], ignore, sqlError);
+				tx.executeSql('alter table TRACK_PLAY add column room text', [], ignore, sqlError);
+				tx.executeSql('update DB_DATA set version = 3', [], ignore, sqlError);
+				currentVersion = 3;
+			}
 		}
 		
 		function undefinedToBlank(val) {
@@ -83,8 +89,8 @@
 				tx.executeSql('select count(*) as num from TRACK_PLAY where id = ?', [trackData.id], function(tx2, rs) {
 						if(rs.rows.item(0)["num"] == 0) {
 							tx2.executeSql('insert into TRACK_PLAY ' +
-								'(id, artist, title, album, filename, user, date, lastfm_status, lastfm_url)' + 
-								'values (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+								'(id, artist, title, album, filename, user, date, lastfm_status, lastfm_url, user_id, room)' + 
+								'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
 								[trackData.id,
 									undefinedToBlank(trackData.artist),
 									undefinedToBlank(trackData.title),
@@ -93,7 +99,9 @@
 									undefinedToBlank(trackData.user),
 									(new Date()).getTime(),
 									lastfmSession && isCurrent ? lastfmStatus.UNSENT : lastfmStatus.SCROBBLING_DISABLED,
-									''
+									'',
+									trackData.userId,
+									trackData.room
 								],
 								ignore, sqlError);
 						}
@@ -130,7 +138,7 @@
 		function getTrackInfo(trackId, fetchMissingData, callback) {
 			db.transaction(function(tx) {
 				var info = {};
-				tx.executeSql('select lastfm_status, lastfm_url, lastfm_loved, album_art, title, artist, album, user from TRACK_PLAY where id = ?', [trackId], function(tx, rs) {
+				tx.executeSql('select lastfm_status, lastfm_url, lastfm_loved, album_art, title, artist, album, user, user_id from TRACK_PLAY where id = ?', [trackId], function(tx, rs) {
 					if(rs.rows.length == 1) {
 						var albumArt = rs.rows.item(0)["album_art"];
 						if((!albumArt || albumArt == "") && fetchMissingData) {
@@ -167,6 +175,7 @@
 						info.lastfmstatus = rs.rows.item(0)["lastfm_status"];
 						info.lastfmloved = (rs.rows.item(0)["lastfm_loved"] == lastfmLovedStatus.LOVE_SENT || rs.rows.item(0)["lastfm_loved"] == lastfmLovedStatus.LOVE_ACKNOWLEDGED);
 						info.user = rs.rows.item(0)["user"];
+						info.userId = rs.rows.item(0)["user_id"];
 						
 						callback(info);
 					} else {
