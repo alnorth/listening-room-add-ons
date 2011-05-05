@@ -214,10 +214,10 @@
 				if(request.isCurrent) {
 					currentTrack = request.track;
 					setNowPlaying(request.track);
+					setPastTracksToScrobbleable();
 				}
 				tabsForTracks[request.track.id] = sender.tab.id;
 				
-				setPastTracksToScrobbleable();
 				addTrackToDB(request.track, request.isCurrent);
 								
 				sendResponse({"id": request.id});
