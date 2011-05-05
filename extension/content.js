@@ -165,7 +165,7 @@ function processMessage(request, sender, sendResponse) {
 		showLastFmLogin();
 		sendResponse({});
 	} else if(request.type = "updatedtrackinfo") {
-		storedTrackInfo[request.id] = request.info;
+		updatedTrackInfo(request.id, request.info);
 		sendResponse({});
 	}
 }
@@ -189,9 +189,14 @@ function resizedImage(width, url) {
 function fetchTrackInfo(trackId) {
 	chrome.extension.sendRequest({type: "gettrackinfo", id:trackId}, function(response) {
 		if(response != undefined) {
-			storedTrackInfo[trackId] = response;
+			updatedTrackInfo(trackId, response);
 		}
 	});
+}
+
+function updatedTrackInfo(trackId, info) {
+	storedTrackInfo[trackId] = info;
+	updateSingleTrackData(trackId);
 }
 
 function updateAllTrackData() {
@@ -336,10 +341,6 @@ function pulse() {
 	linkifyTwitterNames();
 }
 
-function slowPulse() {
-	updateAllTrackData();
-}
-
 function init() {
 	$("body").append("<div id=\"addons\"></div>");
 	chrome.extension.sendRequest({type: "gethtml", url:"popups.html"}, function(response) {
@@ -374,7 +375,6 @@ function init() {
 	}
 	
 	setInterval(pulse, 1000);
-	setInterval(slowPulse, 3000);
 	chrome.extension.onRequest.addListener(processMessage);
 }
 
