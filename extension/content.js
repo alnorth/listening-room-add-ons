@@ -176,6 +176,11 @@ function checkForNewTracks() {
 		addTrackToDB(trackId);
 		$(this).addClass("addons_added_to_db");
 	});
+	$("div.addons_trackdata:not(.addons_track_data_populated)").each(function(index) {
+		var trackId = this.id.replace("addons_trackdata_", "");
+		updateSingleTrackData(trackId, $(this));
+		$(this).addClass("addons_track_data_populated");
+	});
 }
 
 function buttonHtml(url, imagename, titleText) {
