@@ -78,7 +78,7 @@
 			return encodeURIComponent( s ).replace( /\%20/g, '+' ).replace( /[!'()*~]/g, urlEncodeCharacter );
 		}
 		
-		function addTrackToDB(trackData) {
+		function addTrackToDB(trackData, isCurrent) {
 			db.transaction(function(tx) {
 				tx.executeSql('select count(*) as num from TRACK_PLAY where id = ?', [trackData.id], function(tx2, rs) {
 						if(rs.rows.item(0)["num"] == 0) {
@@ -92,7 +92,7 @@
 									trackData.filename,
 									undefinedToBlank(trackData.user),
 									(new Date()).getTime(),
-									lastfmSession ? lastfmStatus.UNSENT : lastfmStatus.SCROBBLING_DISABLED,
+									lastfmSession && isCurrent ? lastfmStatus.UNSENT : lastfmStatus.SCROBBLING_DISABLED,
 									''
 								],
 								ignore, sqlError);
@@ -210,14 +210,16 @@
 		}
 		
 		function processMessage(request, sender, sendResponse) {
-			if(request.type == "newtrack") {
-				currentTrack = request.track;
+			if(request.type == "addtracktodb") {
+				if(request.isCurrent) {
+					currentTrack = request.track;
+					setNowPlaying(request.track);
+				}
 				tabsForTracks[request.track.id] = sender.tab.id;
 				
 				setPastTracksToScrobbleable();
-				addTrackToDB(request.track);
-				setNowPlaying(request.track);
-				
+				addTrackToDB(request.track, request.isCurrent);
+								
 				sendResponse({"id": request.id});
 			} else if(request.type == "lastfmlogin") {
 				lastFmLoginData(request.login);

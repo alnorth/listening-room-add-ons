@@ -3,7 +3,6 @@ pDiv.setAttribute("onclick", "return window;");
 p = pDiv.onclick();
 
 var $ = p.$;
-var currentTrackId = "";
 var settings;
 var storedTrackInfo = {};
 var recordsWithArtInCss = {};
@@ -38,7 +37,7 @@ function getUser(id) {
 	return user;
 }
 
-function newTrack(id) {
+function addTrackToDB(id) {
 	var track = p.room.tracks[id];
 	var user = getUser(track.userId);
 	var trackData = {
@@ -53,7 +52,7 @@ function newTrack(id) {
 		trackData.artist = track.metadata.artist;
 		trackData.album = track.metadata.album;
 	}
-	chrome.extension.sendRequest({type: "newtrack", track: trackData}, function(response) {});
+	chrome.extension.sendRequest({type: "addtracktodb", track: trackData, isCurrent: (id == p.room.nowPlaying)}, function(response) {});
 }
 
 function showDimmer(closeFunction) {
@@ -171,11 +170,12 @@ function processMessage(request, sender, sendResponse) {
 	}
 }
 
-function checkForNewTrack() {
-	if(p.room.nowPlaying != undefined && currentTrackId != p.room.nowPlaying) {
-		newTrack(p.room.nowPlaying);
-		currentTrackId = p.room.nowPlaying;
-	}
+function checkForNewTracks() {
+	$("div.recordWithDescription:not(.addons_added_to_db)").each(function() {
+		var trackId = this.id.replace("record-", "");
+		addTrackToDB(trackId);
+		$(this).addClass("addons_added_to_db");
+	});
 }
 
 function buttonHtml(url, imagename, titleText) {
@@ -196,14 +196,14 @@ function fetchTrackInfo(trackId) {
 
 function updateAllTrackData() {
 	$("div.addons_trackdata").each(function(index) {
-		var trackId = this.id.substring(16);
+		var trackId = this.id.replace("addons_trackdata_", "");
 		updateSingleTrackData(trackId, $(this));
 	});
 }
 
 function updateSingleTrackData(trackId, el) {
 	if(!el) {
-		el = $("div#addon_trackdata_"+ trackId);
+		el = $("div#addons_trackdata_"+ trackId);
 	}
 	var track = p.room.tracks[trackId];
 	var trackDataHtml = "";
@@ -301,7 +301,7 @@ function setTrackLoved(trackId, title, artist) {
 }
 
 function addTrackDataDiv(html, track, opt_userP) {
-	var dataDiv = "<div id=\"addon_trackdata_"+ track.id +"\" class=\"addons_trackdata\"></div>";
+	var dataDiv = "<div id=\"addons_trackdata_"+ track.id +"\" class=\"addons_trackdata\"></div>";
 
 	var jHtml = $(html);
 	jHtml.find("div.description").append(dataDiv);
@@ -332,7 +332,7 @@ function removeTwitterLinksIfNecessary() {
 }
 
 function pulse() {
-	checkForNewTrack();
+	checkForNewTracks();
 	linkifyTwitterNames();
 }
 
