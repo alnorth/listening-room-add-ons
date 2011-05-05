@@ -211,15 +211,15 @@
 		
 		function processMessage(request, sender, sendResponse) {
 			if(request.type == "addtracktodb") {
+				tabsForTracks[request.track.id] = sender.tab.id;
+				addTrackToDB(request.track, request.isCurrent);
+				
 				if(request.isCurrent) {
 					currentTrack = request.track;
 					setNowPlaying(request.track);
 					setPastTracksToScrobbleable();
 				}
-				tabsForTracks[request.track.id] = sender.tab.id;
 				
-				addTrackToDB(request.track, request.isCurrent);
-								
 				sendResponse({"id": request.id});
 			} else if(request.type == "lastfmlogin") {
 				lastFmLoginData(request.login);
