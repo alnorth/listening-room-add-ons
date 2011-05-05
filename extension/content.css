@@ -9,8 +9,7 @@ div#addons_lightbox_dimmer {
 	left: 0px;
 	right: 0px;
 	display: none;
-    opacity: .80; /*FOR ALL OTHER BROWSERS AND DEVICES*/
-    filter: alpha(opacity=80); /*FOR IE7*/
+    opacity: .80;
 }
 
 div#addons_lastfmlogin, div#addons_settings, div#addons_changelog {
