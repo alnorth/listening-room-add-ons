@@ -6,6 +6,7 @@ var $ = p.$;
 var settings;
 var storedTrackInfo = {};
 var recordsWithArtInCss = {};
+var initialChatMessagesProcessed = false;
 
 ////////////////////////////Enums
 		
@@ -90,7 +91,8 @@ function saveSettings() {
 	settings.showuploader = document.getElementById("addons_settings_showuploader").checked;
 	settings.albumart = document.getElementById("addons_settings_albumart").checked;
 	settings.twitterusernamelinks = document.getElementById("addons_settings_twitterusernamelinks").checked;
-	
+	settings.showchattimestamps = document.getElementById("addons_settings_showchattimestamps").checked;
+		
 	settings.scrobble = document.getElementById("addons_settings_scrobble").checked;
 	settings.showscrobblestatus = document.getElementById("addons_settings_showscrobblestatus").checked;
 	settings.lastfmlink = document.getElementById("addons_settings_lastfmlink").checked;
@@ -102,6 +104,7 @@ function saveSettings() {
 	applyChatHidden();
 	removeRecordImagesIfNecessary();
 	removeTwitterLinksIfNecessary();
+	removeChatTimestampsIfNecessary();
 }
 
 function loadSettings() {
@@ -110,6 +113,7 @@ function loadSettings() {
 		document.getElementById("addons_settings_showuploader").checked = newSettings.showuploader;
 		document.getElementById("addons_settings_albumart").checked = newSettings.albumart;
 		document.getElementById("addons_settings_twitterusernamelinks").checked = newSettings.twitterusernamelinks;
+		document.getElementById("addons_settings_showchattimestamps").checked = newSettings.showchattimestamps;
 		
 		document.getElementById("addons_settings_scrobble").checked = newSettings.scrobble;
 		document.getElementById("addons_settings_showscrobblestatus").checked = newSettings.showscrobblestatus;
@@ -236,7 +240,7 @@ function updateSingleTrackData(trackId, el) {
 			if(user != undefined && user != "") {
 				if(settings.twitterusernamelinks) {
 					var twitterUrl = "http://www.twitter.com/"+ user;
-					trackDataHtml += '<div class="addons_uploader">Uploaded by <span class="username addons_username" data-username="'+ user +'"><a href="'+ twitterUrl +'" target="_blank">'+ user +'</a></span></div>';
+					trackDataHtml += '<div class="addons_uploader">Uploaded by <span class="username addons_twitter_username" data-username="'+ user +'"><a href="'+ twitterUrl +'" target="_blank">'+ user +'</a></span></div>';
 				} else {
 					trackDataHtml += '<div class="addons_uploader">Uploaded by <span class="username">'+ user +'</span></div>';
 				}
@@ -330,8 +334,8 @@ function addTrackDataDiv(html, track, opt_userP) {
 
 function linkifyTwitterNames() {
 	if(settings.twitterusernamelinks) {
-		$(".username:not(.addons_username), li.user span.name:not(.addons_username)").each(function(index){
-			$(this).addClass("addons_username");
+		$(".username:not(.addons_twitter_username), li.user span.name:not(.addons_twitter_username)").each(function(index){
+			$(this).addClass("addons_twitter_username");
 			var username = this.innerHTML;
 			this.dataset.username = username;
 			var twitterUrl = "http://www.twitter.com/"+ username;
@@ -342,16 +346,53 @@ function linkifyTwitterNames() {
 
 function removeTwitterLinksIfNecessary() {
 	if(!settings.twitterusernamelinks) {
-		$(".username.addons_username, span.name.addons_username").each(function(index){
-			$(this).removeClass("addons_username");
+		$(".username.addons_twitter_username, span.name.addons_twitter_username").each(function(index){
+			$(this).removeClass("addons_twitter_username");
 			this.innerHTML = this.dataset.username;
 		});
+	}
+}
+
+function zeroPadTime(num) {
+	var str = new String(num);
+	return str.length == 2 ? str : "0" + str;
+}
+
+function checkForNewChatMessages() {
+	// Record the time of any new chat messages
+	var untimed = $(".annotation:not([data-time])");
+	untimed.each(function(index){
+		// The first time we pick up messages it will probably be chat that was present when the user entered
+		// the room, we have no idea when these messages were posted.
+		if(initialChatMessagesProcessed) {
+			var now = new Date();
+			this.dataset.time = zeroPadTime(now.getHours()) + ":" + zeroPadTime(now.getMinutes());
+		} else {
+			this.dataset.time = "none";
+		}
+	});
+	
+	if(untimed.length > 0 && !initialChatMessagesProcessed) {
+		initialChatMessagesProcessed = true;
+	}
+	
+	if(settings.showchattimestamps) {
+		$('.annotation[data-time]:not(:has(div.addons_chat_timestamp)):not([data-time="none"])').each(function(index) {
+			$(this).prepend("<div class=\"addons_chat_timestamp\">"+ this.dataset.time +"</div>");
+		});
+	}
+}
+
+function removeChatTimestampsIfNecessary() {
+	if(!settings.showchattimestamps) {
+		$("div.addons_chat_timestamp").remove();
 	}
 }
 
 function pulse() {
 	checkForNewTracks();
 	linkifyTwitterNames();
+	checkForNewChatMessages();
 }
 
 function init() {

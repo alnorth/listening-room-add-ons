@@ -85,3 +85,11 @@ div.addons_uploader  {
 div.addons_trackdata img {
 	margin-left: 1px;
 }
+
+div.addons_chat_timestamp {
+	float: right;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	color: #998;
+	line-height: 1.5;
+	font-size: 13px;
+}

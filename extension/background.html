@@ -257,7 +257,8 @@
 			window.localStorage.setItem("showuploader", settings.showuploader ? "true" : "false");
 			window.localStorage.setItem("albumart", settings.albumart ? "true" : "false");
 			window.localStorage.setItem("twitterusernamelinks", settings.twitterusernamelinks ? "true" : "false");
-			
+			window.localStorage.setItem("showchattimestamps", settings.showchattimestamps ? "true" : "false");
+						
 			window.localStorage.setItem("scrobble", settings.scrobble ? "true" : "false");
 			window.localStorage.setItem("showscrobblestatus", settings.showscrobblestatus ? "true" : "false");
 			window.localStorage.setItem("lastfmlink", settings.lastfmlink ? "true" : "false");
@@ -278,7 +279,9 @@
 			settings.albumart = (!albumart || albumart == "true");
 			var twitterusernamelinks = window.localStorage.getItem("twitterusernamelinks");
 			settings.twitterusernamelinks = (!twitterusernamelinks || twitterusernamelinks == "true");
-			
+			var showchattimestamps = window.localStorage.getItem("showchattimestamps");
+			settings.showchattimestamps = (!showchattimestamps || showchattimestamps == "true");
+						
 			var scrobble = window.localStorage.getItem("scrobble");
 			settings.scrobble = (!scrobble || scrobble == "true");
 			var lastfmlink = window.localStorage.getItem("lastfmlink");
