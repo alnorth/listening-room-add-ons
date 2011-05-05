@@ -52,7 +52,10 @@ function addTrackToDB(id) {
 		trackData.artist = track.metadata.artist;
 		trackData.album = track.metadata.album;
 	}
-	chrome.extension.sendRequest({type: "addtracktodb", track: trackData, isCurrent: (id == p.room.nowPlaying)}, function(response) {});
+	chrome.extension.sendRequest({type: "addtracktodb", track: trackData, isCurrent: (id == p.room.nowPlaying)}, function(response) {
+		//Once it's been added to the DB we get the data back again to load into our cache.
+		fetchTrackInfo(id)
+	});
 }
 
 function showDimmer(closeFunction) {
@@ -171,15 +174,18 @@ function processMessage(request, sender, sendResponse) {
 }
 
 function checkForNewTracks() {
-	$("div.recordWithDescription:not(.addons_added_to_db)").each(function() {
+	$("div.recordWithDescription").filter(function() {
+		// We filter out all the records with descriptions, or ones that are currently uploading.
+		// For uploading tracks the description div is refreshed so quickly that our additions will
+		// just flicker for a fraction of a second. We'll display them once the upload has finished.
+		return $(this).find("div.addons_trackdata, div.progress").length === 0;
+	}).each(function() {
 		var trackId = this.id.replace("record-", "");
+		
+		var dataDiv = "<div id=\"addons_trackdata_"+ trackId +"\" class=\"addons_trackdata\"></div>";
+		$(this).find("div.description").append(dataDiv);
+		
 		addTrackToDB(trackId);
-		$(this).addClass("addons_added_to_db");
-	});
-	$("div.addons_trackdata:not(.addons_track_data_populated)").each(function(index) {
-		var trackId = this.id.replace("addons_trackdata_", "");
-		updateSingleTrackData(trackId, $(this));
-		$(this).addClass("addons_track_data_populated");
 	});
 }
 
@@ -367,17 +373,6 @@ function init() {
 		$("#addons_settings_link").click(showSettings);
 		$("#addons_changelog_link").click(showChangelog);
 	});
-	
-	if(!p.viz.recordHtmlOriginal) {
-		p.viz.recordHtmlOriginal = p.viz.recordHtml;
-		p.viz.recordHtmlMods = [];
-		
-		p.viz.recordHtml = function(track, opt_userP) {
-			var html = p.viz.recordHtmlOriginal(track, opt_userP);
-			html = addTrackDataDiv(html, track, opt_userP);
-			return html;
-		};
-	}
 	
 	setInterval(pulse, 1000);
 	chrome.extension.onRequest.addListener(processMessage);
