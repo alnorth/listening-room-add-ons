@@ -248,6 +248,7 @@ function updateSingleTrackData(trackId, el) {
 				trackDataHtml += '<div class="addons_uploader">Uploader has now left the room</div>';
 			}
 		}
+		trackDataHtml += '<div class="addons_track_links">';
 		if(settings.lastfmlink && trackInfo.lastfmurl && trackInfo.lastfmurl != "none") {
 			trackDataHtml += buttonHtml(trackInfo.lastfmurl, chrome.extension.getURL("lastfm_button.png"), "See this track on Last.fm.");
 		}
@@ -268,6 +269,7 @@ function updateSingleTrackData(trackId, el) {
 		if(settings.showlastfmlovebutton && !trackInfo.lastfmloved && track.metadata.title) {
 			trackDataHtml += '<a href="javascript:void(0);" class="addons_lastfm_lovebutton"><img style="border: 0px;" src="'+ chrome.extension.getURL("lovebutton.png") +'" title="Love this track on Last.fm" /></a>'
 		}
+		trackDataHtml += '</div>';
 		
 	} else {
 		fetchTrackInfo(trackId);

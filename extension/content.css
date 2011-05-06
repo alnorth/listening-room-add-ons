@@ -82,6 +82,14 @@ div.addons_uploader  {
 	margin-bottom: 5px;
 }
 
+div.addons_track_links {
+	visibility: hidden;
+}
+
+div.recordWithDescription:hover div.addons_track_links {
+	visibility: visible;
+}
+
 div.addons_trackdata img {
 	margin-left: 1px;
 }
@@ -97,4 +105,12 @@ div.addons_chat_timestamp {
 
 div.annotation:hover div.addons_chat_timestamp {
 	display: block;
+}
+
+.addons_twitter_username a {
+	text-decoration: none !important;
+}
+
+.addons_twitter_username a:hover {
+	text-decoration: underline !important;
 }
