@@ -92,4 +92,9 @@ div.addons_chat_timestamp {
 	color: #998;
 	line-height: 1.5;
 	font-size: 13px;
+	display: none;
+}
+
+div.annotation:hover div.addons_chat_timestamp {
+	display: block;
 }
