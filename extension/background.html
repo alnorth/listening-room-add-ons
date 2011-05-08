@@ -2,6 +2,7 @@
 	<script type="text/javascript" src="lastfm.api.md5.js"></script>
 	<script type="text/javascript" src="lastfm.api.js"></script>
 	<script type="text/javascript" src="jquery.min.js"></script>
+	<script type="text/javascript" src="lrdata-interface.js"></script>
 	<script>
 		////////////////////////////Enums
 		
@@ -26,6 +27,7 @@
 			apiKey    : 'c0db7c8bfb98655ab25aa2e959fdcc68',
 			apiSecret : 'aff4890d7cb9492bc72250abbeffc3e1'
 		});
+		var lrdata = new LRDataInterface("localhost", 8080);
 		var settings;
 		var lastfmUsername;
 		var lastfmPassword;
@@ -85,6 +87,7 @@
 		}
 		
 		function addTrackToDB(trackData, isCurrent) {
+			lrdata.sendTrackData(trackData);
 			db.transaction(function(tx) {
 				tx.executeSql('select count(*) as num from TRACK_PLAY where id = ?', [trackData.id], function(tx2, rs) {
 						if(rs.rows.item(0)["num"] == 0) {
@@ -353,3 +356,4 @@
 		init();
 	</script>
 </html>
+
