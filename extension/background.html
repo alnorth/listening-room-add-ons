@@ -100,7 +100,7 @@
 									undefinedToBlank(trackData.album),
 									trackData.filename,
 									undefinedToBlank(trackData.user),
-									(new Date()).getTime(),
+									trackData.timestamp,
 									lastfmSession && isCurrent ? lastfmStatus.UNSENT : lastfmStatus.SCROBBLING_DISABLED,
 									'',
 									trackData.userId,

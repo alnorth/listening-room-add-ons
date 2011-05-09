@@ -38,6 +38,21 @@ function getUser(id) {
 	return user;
 }
 
+function getTrackStartTimestamp(trackId) {
+	var timestamp = null;
+	for(var i = p.room.history.length - 1; i >= 0; i--) {
+		var h = p.room.history[i];
+		if(h.event == "trackStart" && h.data == trackId) {
+			timestamp = h.timestamp;
+		}
+	}
+	if(timestamp == null) {
+		timestamp = (new Date()).getTime();
+	}
+	return timestamp;
+	
+}
+
 function addTrackToDB(id) {
 	var track = p.room.tracks[id];
 	var user = getUser(track.userId);
@@ -45,7 +60,8 @@ function addTrackToDB(id) {
 		id: id,
 		filename: track.upload.originalFilename,
 		userId: track.userId,
-		room: p.room.id
+		room: p.room.id,
+		timestamp: getTrackStartTimestamp(id)
 	};
 	if(user != undefined) {
 		trackData.user = user.name;

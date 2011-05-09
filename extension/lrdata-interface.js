@@ -13,7 +13,7 @@ function LRDataInterface(hostname, port) {
 				user: track.user,
 				userId: track.userId,
 				room: track.room,
-				timestamp: (new Date()).getTime()
+				timestamp: track.timestamp
 			}
 		);
 	}
