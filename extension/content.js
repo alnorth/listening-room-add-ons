@@ -45,7 +45,9 @@ function addTrackToDB(id) {
 		id: id,
 		filename: track.upload.originalFilename,
 		userId: track.userId,
-		room: p.room.id
+		room: p.room.id,
+		reportedByUser: p.room.user.name,
+		reportedByUserId: p.room.user.id
 	};
 	if(user != undefined) {
 		trackData.user = user.name;
