@@ -5,7 +5,7 @@
 	"background_page": "background.html",
 	"content_scripts": [
 		{
-		"matches": ["http://listeningroom.net/room/*", "http://www.listeningroom.net/room/*"],
+		"matches": ["http://listeningroom.net/room/*", "http://www.listeningroom.net/room/*", "http://listeningroom.fettig.net/room/*"],
 		"css": ["content.css"],
 		"js": ["content.js"]
 		}
