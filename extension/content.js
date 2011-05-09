@@ -28,19 +28,9 @@ function urlEncode(s) {
     return encodeURIComponent( s ).replace( /\%20/g, '+' ).replace( /[!'()*~]/g, urlEncodeCharacter );
 }
 
-function getUser(id) {
-	var user = undefined;
-	for(var i = 0; i < p.room.users.length; i++) {
-		if(p.room.users[i].id == id) {
-			user = p.room.users[i];
-		}
-	}
-	return user;
-}
-
 function addTrackToDB(id) {
 	var track = p.room.tracks[id];
-	var user = getUser(track.userId);
+	var user = p.room.normalizedUsersById[track.userId];
 	var trackData = {
 		id: id,
 		filename: track.upload.originalFilename,
