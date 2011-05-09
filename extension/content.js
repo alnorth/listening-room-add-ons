@@ -168,6 +168,17 @@ function dontDoLastFmLogin() {
 	hideLastFmLogin();
 }
 
+function showCharts() {
+	showDimmer(hideCharts);
+	$("#addons_charts_div").height($(p).height() - 220);
+	$("#addons_charts").show();
+}
+
+function hideCharts() {
+	hideDimmer();
+	$("#addons_charts").hide();
+}
+
 function processMessage(request, sender, sendResponse) {
 	if(request.type == "lastfmloginneeded") {
 		if(request.lastfmUsername && $("#addons_lastfm_username").val() == "") {
@@ -407,6 +418,7 @@ function init() {
 		$("#addons_settings_save").click(saveSettings);
 		$("#addons_settings_cancel").click(hideSettings);
 		$("#addons_changelog_close").click(hideChangelog);
+		$("#addons_charts_close").click(hideCharts);
 		
 		loadSettings();
 	
@@ -417,6 +429,7 @@ function init() {
 	$("#sponsor").before("<div id=\"addons_links\"></div>");
 	chrome.extension.sendRequest({type: "gethtml", url:"links.html"}, function(response) {
 		$("#addons_links").html(response);
+		$("#addons_charts_link").click(showCharts);
 		$("#addons_settings_link").click(showSettings);
 		$("#addons_changelog_link").click(showChangelog);
 	});

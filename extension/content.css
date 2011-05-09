@@ -12,7 +12,7 @@ div#addons_lightbox_dimmer {
     opacity: .80;
 }
 
-div#addons_lastfmlogin, div#addons_settings, div#addons_changelog {
+div#addons_lastfmlogin, div#addons_settings, div#addons_changelog, div#addons_charts {
 	display: none;
     background-color: white;
     margin-top: 50px;
@@ -30,19 +30,19 @@ div#addons_lastfmlogin {
 	margin-left: -125px;
 }
 
-div#addons_settings {
+div#addons_settings, div#addons_changelog {
 	margin-top: 20px;
 	width: 350px;
 	margin-left: -175px;
 }
 
-div#addons_changelog {
+div#addons_charts {
 	margin-top: 20px;
-	width: 350px;
-	margin-left: -175px;
+	width: 750px;
+	margin-left: -325px;
 }
 
-div#addons_settings_div, div#addons_changelog_div {
+div#addons_settings_div, div#addons_changelog_div, div#addons_charts_div {
 	height: 300px;
 	overflow: auto;
 	margin-bottom: 20px;
