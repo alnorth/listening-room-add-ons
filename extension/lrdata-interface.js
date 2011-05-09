@@ -13,7 +13,9 @@ function LRDataInterface(hostname, port) {
 				user: track.user,
 				userId: track.userId,
 				room: track.room,
-				timestamp: track.timestamp
+				timestamp: track.timestamp,
+				reportedByUser: track.reportedByUser,
+				reportedByUserId: track.reportedByUserId
 			}
 		);
 	}

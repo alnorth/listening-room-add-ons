@@ -28,16 +28,6 @@ function urlEncode(s) {
     return encodeURIComponent( s ).replace( /\%20/g, '+' ).replace( /[!'()*~]/g, urlEncodeCharacter );
 }
 
-function getUser(id) {
-	var user = undefined;
-	for(var i = 0; i < p.room.users.length; i++) {
-		if(p.room.users[i].id == id) {
-			user = p.room.users[i];
-		}
-	}
-	return user;
-}
-
 function getTrackStartTimestamp(trackId) {
 	var timestamp = null;
 	for(var i = p.room.history.length - 1; i >= 0; i--) {
@@ -55,13 +45,15 @@ function getTrackStartTimestamp(trackId) {
 
 function addTrackToDB(id) {
 	var track = p.room.tracks[id];
-	var user = getUser(track.userId);
+	var user = p.room.normalizedUsersById[track.userId];
 	var trackData = {
 		id: id,
 		filename: track.upload.originalFilename,
 		userId: track.userId,
 		room: p.room.id,
-		timestamp: getTrackStartTimestamp(id)
+		timestamp: getTrackStartTimestamp(id),
+		reportedByUser: p.room.user.name,
+		reportedByUserId: p.room.user.id
 	};
 	if(user != undefined) {
 		trackData.user = user.name;
@@ -180,6 +172,17 @@ function dontDoLastFmLogin() {
 	chrome.extension.sendRequest({type: "savesettings", settings:settings}, function(response) {});
 	updateAllTrackData();
 	hideLastFmLogin();
+}
+
+function showCharts() {
+	showDimmer(hideCharts);
+	$("#addons_charts_div").height($(p).height() - 220);
+	$("#addons_charts").show();
+}
+
+function hideCharts() {
+	hideDimmer();
+	$("#addons_charts").hide();
 }
 
 function processMessage(request, sender, sendResponse) {
@@ -421,6 +424,7 @@ function init() {
 		$("#addons_settings_save").click(saveSettings);
 		$("#addons_settings_cancel").click(hideSettings);
 		$("#addons_changelog_close").click(hideChangelog);
+		$("#addons_charts_close").click(hideCharts);
 		
 		loadSettings();
 	
@@ -431,6 +435,7 @@ function init() {
 	$("#sponsor").before("<div id=\"addons_links\"></div>");
 	chrome.extension.sendRequest({type: "gethtml", url:"links.html"}, function(response) {
 		$("#addons_links").html(response);
+		$("#addons_charts_link").click(showCharts);
 		$("#addons_settings_link").click(showSettings);
 		$("#addons_changelog_link").click(showChangelog);
 	});

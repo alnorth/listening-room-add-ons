@@ -1,0 +1,46 @@
+room - Name of the room
+from - Unix timestamp of the earliest data to return
+to - Unix timestamp of the latest data to return
+callback - Callback function name
+limit - Maximum number of results to return
+offset - Number of results to skip
+order - Ordering to use, the available values and default will change with each type of data.
+
+
+http://lrdata.alnorth.com:8080/v1/artist.json
+params:
+	id
+	artist_name
+types:
+	tracks - ordering: track_title, plays
+	users - ordering: username, plays
+	all_plays - ordering: username, track_title, date
+	
+http://lrdata.alnorth.com:8080/v1/all_artists.json
+Aggregate plays - ordering: artist_name, plays
+
+
+http://lrdata.alnorth.com:8080/v1/track.json
+params:
+	id
+	track_title
+	track_artist
+types:
+	users - ordering: username, plays
+	all_plays - ordering: username, date
+
+http://lrdata.alnorth.com:8080/v1/all_tracks.json
+Aggregate plays - ordering: artist_name, track_title, plays
+
+
+http://lrdata.alnorth.com:8080/v1/user.json
+params:
+	id
+	username
+types:
+	artists - ordering: artist_name, plays
+	tracks - ordering: artist_name, track_title, plays
+	all_plays - ordering: artist_name, track_title, date
+
+http://lrdata.alnorth.com:8080/v1/all_users.json
+Aggregate plays - ordering: username, plays
