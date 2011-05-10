@@ -72,6 +72,18 @@
 				tx.executeSql('update DB_DATA set version = 3', [], ignore, sqlError);
 				currentVersion = 3;
 			}
+			if(currentVersion == 3) {
+				tx.executeSql('alter table TRACK_PLAY add column reported_by_user text', [], ignore, sqlError);
+				tx.executeSql('alter table TRACK_PLAY add column reported_by_user_id text', [], ignore, sqlError);
+				tx.executeSql('alter table TRACK_PLAY add column send_data int', [], ignore, sqlError);
+				tx.executeSql('update TRACK_PLAY set send_data = 0', [], ignore, sqlError);
+				tx.executeSql('alter table TRACK_PLAY add column data_track_id int', [], ignore, sqlError);
+				tx.executeSql('alter table TRACK_PLAY add column data_artist_id int', [], ignore, sqlError);
+				tx.executeSql('alter table TRACK_PLAY add column data_play_id int', [], ignore, sqlError);
+				tx.executeSql('update DB_DATA set version = 4', [], ignore, sqlError);
+				currentVersion = 4;
+			}
+
 		}
 		
 		function undefinedToBlank(val) {
@@ -87,13 +99,12 @@
 		}
 		
 		function addTrackToDB(trackData, isCurrent) {
-			lrdata.sendTrackData(trackData);
 			db.transaction(function(tx) {
 				tx.executeSql('select count(*) as num from TRACK_PLAY where id = ?', [trackData.id], function(tx2, rs) {
 						if(rs.rows.item(0)["num"] == 0) {
 							tx2.executeSql('insert into TRACK_PLAY ' +
-								'(id, artist, title, album, filename, user, date, lastfm_status, lastfm_url, user_id, room)' + 
-								'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+								'(id, artist, title, album, filename, user, date, lastfm_status, lastfm_url, user_id, room, reported_by_user, reported_by_user_id, send_data)' + 
+								'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
 								[trackData.id,
 									undefinedToBlank(trackData.artist),
 									undefinedToBlank(trackData.title),
@@ -104,7 +115,10 @@
 									lastfmSession && isCurrent ? lastfmStatus.UNSENT : lastfmStatus.SCROBBLING_DISABLED,
 									'',
 									trackData.userId,
-									trackData.room
+									trackData.room,
+									trackData.reportedByUser,
+									trackData.reportedByUserId,
+									settings.senddata ? 1 : 0
 								],
 								ignore, sqlError);
 						}
@@ -261,7 +275,9 @@
 			window.localStorage.setItem("albumart", settings.albumart ? "true" : "false");
 			window.localStorage.setItem("twitterusernamelinks", settings.twitterusernamelinks ? "true" : "false");
 			window.localStorage.setItem("showchattimestamps", settings.showchattimestamps ? "true" : "false");
-						
+			
+			window.localStorage.setItem("senddata", settings.senddata ? "true" : "false");
+			
 			window.localStorage.setItem("scrobble", settings.scrobble ? "true" : "false");
 			window.localStorage.setItem("showscrobblestatus", settings.showscrobblestatus ? "true" : "false");
 			window.localStorage.setItem("lastfmlink", settings.lastfmlink ? "true" : "false");
@@ -284,6 +300,9 @@
 			settings.twitterusernamelinks = (!twitterusernamelinks || twitterusernamelinks == "true");
 			var showchattimestamps = window.localStorage.getItem("showchattimestamps");
 			settings.showchattimestamps = (!showchattimestamps || showchattimestamps == "true");
+			
+			var senddata = window.localStorage.getItem("senddata");
+			settings.senddata = (senddata && senddata == "true");
 						
 			var scrobble = window.localStorage.getItem("scrobble");
 			settings.scrobble = (!scrobble || scrobble == "true");
@@ -331,6 +350,19 @@
 							}, error: function(code, message){
 								console.log("Last.fm scrobble error: " + code + " - " + message);
 							}});
+						}
+					}, sqlError);
+				});
+			}
+		}
+		
+		function sendOldestUnsentData() {
+			if(settings.senddata) {
+				db.transaction(function(tx) {
+					tx.executeSql('select id, artist, title, album, user, user_id, room, date, reported_by_user, reported_by_user_id from TRACK_PLAY where send_data = ? and data_play_id is null order by date limit 1', [1], function(tx2, rs) {
+						if(rs.rows.length == 1) {
+							var row = rs.rows.item(0);
+							lrdata.sendTrackData(row);
 						}
 					}, sqlError);
 				});

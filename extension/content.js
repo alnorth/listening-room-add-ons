@@ -102,7 +102,9 @@ function saveSettings() {
 	settings.albumart = document.getElementById("addons_settings_albumart").checked;
 	settings.twitterusernamelinks = document.getElementById("addons_settings_twitterusernamelinks").checked;
 	settings.showchattimestamps = document.getElementById("addons_settings_showchattimestamps").checked;
-		
+	
+	settings.senddata = document.getElementById("addons_settings_senddata").checked;
+			
 	settings.scrobble = document.getElementById("addons_settings_scrobble").checked;
 	settings.showscrobblestatus = document.getElementById("addons_settings_showscrobblestatus").checked;
 	settings.lastfmlink = document.getElementById("addons_settings_lastfmlink").checked;
@@ -124,6 +126,8 @@ function loadSettings() {
 		document.getElementById("addons_settings_albumart").checked = newSettings.albumart;
 		document.getElementById("addons_settings_twitterusernamelinks").checked = newSettings.twitterusernamelinks;
 		document.getElementById("addons_settings_showchattimestamps").checked = newSettings.showchattimestamps;
+		
+		document.getElementById("addons_settings_senddata").checked = newSettings.senddata;
 		
 		document.getElementById("addons_settings_scrobble").checked = newSettings.scrobble;
 		document.getElementById("addons_settings_showscrobblestatus").checked = newSettings.showscrobblestatus;

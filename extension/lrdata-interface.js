@@ -10,13 +10,12 @@ function LRDataInterface(hostname, port) {
 					artist: track.artist,
 					title: track.title,
 					album: track.album,
-					filename: track.filename,
 					user: track.user,
-					userId: track.userId,
+					userId: track.user_id,
 					room: track.room,
-					timestamp: track.timestamp,
-					reportedByUser: track.reportedByUser,
-					reportedByUserId: track.reportedByUserId
+					timestamp: track.date,
+					reportedByUser: track.reported_by_user,
+					reportedByUserId: track.reported_by_user_id
 				}
 			);
 		}
