@@ -61,7 +61,9 @@ function addTrackToDB(id) {
 	if(track.metadata.artist != undefined && track.metadata.title != undefined) {
 		trackData.title = track.metadata.title;
 		trackData.artist = track.metadata.artist;
-		trackData.album = track.metadata.album;
+		if(track.metadata.album != undefined) {
+			trackData.album = track.metadata.album;
+		}
 	}
 	chrome.extension.sendRequest({type: "addtracktodb", track: trackData, isCurrent: (id == p.room.nowPlaying)}, function(response) {
 		//Once it's been added to the DB we get the data back again to load into our cache.
