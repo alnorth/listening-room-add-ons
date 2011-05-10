@@ -8,4 +8,4 @@ The extension itself is in the "extension" folder, while other resources are in 
 
 ##License
 
-Unless otherwise stated in comments files included in this extension are provided under the Modified BSD License as described in LICENSE.txt.
+Unless otherwise stated in comments, files included in this extension are provided under the Modified BSD License as described in LICENSE.txt.
