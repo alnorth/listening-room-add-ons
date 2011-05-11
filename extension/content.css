@@ -27,19 +27,19 @@ div#addons_lastfmlogin, div#addons_settings, div#addons_changelog, div#addons_ch
 
 div#addons_lastfmlogin {
 	width: 250px;
-	margin-left: -125px;
+	margin-left: -145px;
 }
 
 div#addons_settings, div#addons_changelog {
 	margin-top: 20px;
 	width: 350px;
-	margin-left: -175px;
+	margin-left: -195px;
 }
 
 div#addons_charts {
 	margin-top: 20px;
 	width: 750px;
-	margin-left: -325px;
+	margin-left: -345px;
 }
 
 div#addons_settings_div, div#addons_changelog_div, div#addons_charts_div {
