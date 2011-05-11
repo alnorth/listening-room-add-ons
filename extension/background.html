@@ -302,7 +302,7 @@
 			settings.showchattimestamps = (!showchattimestamps || showchattimestamps == "true");
 			
 			var senddata = window.localStorage.getItem("senddata");
-			settings.senddata = (senddata && senddata == "true");
+			settings.senddata = (!senddata || senddata == "true");
 						
 			var scrobble = window.localStorage.getItem("scrobble");
 			settings.scrobble = (!scrobble || scrobble == "true");
@@ -362,7 +362,11 @@
 					tx.executeSql('select id, artist, title, album, user, user_id, room, date, reported_by_user, reported_by_user_id from TRACK_PLAY where send_data = ? and data_play_id is null order by date limit 1', [1], function(tx2, rs) {
 						if(rs.rows.length == 1) {
 							var row = rs.rows.item(0);
-							lrdata.sendTrackData(row);
+							lrdata.sendTrackData(row, function(data) {
+								db.transaction(function(tx2) {
+									tx2.executeSql('update TRACK_PLAY set data_track_id = ?, data_artist_id = ?, data_play_id = ? where id = ?', [data.trackId, data.artistId, data.playId, row["id"]], ignore, sqlError);
+								});
+							});
 						}
 					}, sqlError);
 				});
@@ -372,6 +376,7 @@
 		function pulse() {
 			showLastfmLoginBox();
 			scrobbleOldestScrobbleableTrack();
+			sendOldestUnsentData();
 		}
 		
 		function init() {

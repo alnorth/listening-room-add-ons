@@ -1,6 +1,6 @@
 function LRDataInterface(hostname, port) {
 	
-	function sendTrackData(track) {
+	function sendTrackData(track, callback) {
 		if(track.title && track.title != "" && track.artist && track.artist != "") {
 			var url = "http://"+ hostname +":"+ port +"/addtrackplay/?callback=?";
 			$.getJSON(
@@ -16,6 +16,9 @@ function LRDataInterface(hostname, port) {
 					timestamp: track.date,
 					reportedByUser: track.reported_by_user,
 					reportedByUserId: track.reported_by_user_id
+				},
+				function(data, textStatus, jqXHR) {
+					callback(data);
 				}
 			);
 		}
