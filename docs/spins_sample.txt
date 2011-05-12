@@ -1,0 +1,39 @@
+{
+	"id": "e2efca4de0c65d14d0030000",
+	"metadata": {
+		"album":"[2007] grindstone",
+		"amazon":{},
+		"artist":"shining",
+		"bitrate":268212,
+		"embedded":{
+			"COMM:iTunNORM:'eng'":" 00001424 00001109 000046DA 00004399 00021944 00018597 00007EBF 00007C3F 000218FF 00035B77",
+			"TDRC":"2007",
+			"TIT2":"In The Kingdom Of Kitsch You Will Be A Monster",
+			"TRCK":"1/12",
+			"TPE1":"shining",
+			"TALB":"[2007] grindstone",
+			"TITLE":"In The Kingdom Of Kitsch You Will Be A Monster",
+			"ARTIST":"shining",
+			"ALBUM":"[2007] grindstone"
+		},
+		"images":{
+			"full":{
+				"filename":"e2efca4de0c65d14d0030000.png",
+				"mimeType":"image/png"
+			},
+			"small":{
+				"filename":"e2efca4de0c65d14d0030000.small.jpg",
+				"mimeType":"image/jpeg"
+			}
+		},
+		"itunes":{
+			"error":"Timed out."
+		},
+		"length":340244.89795918367,
+		"title":"In The Kingdom Of Kitsch You Will Be A Monster"
+	},
+	"length":340270,
+	"userId":"4d6fa5ca78e250eb4500004f",
+	"startTime":"1305145950501",
+	"endTime":"1305146291724"
+},
