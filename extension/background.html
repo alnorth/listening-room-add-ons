@@ -359,7 +359,7 @@
 		function sendOldestUnsentData() {
 			if(settings.senddata) {
 				db.transaction(function(tx) {
-					tx.executeSql('select id, artist, title, album, user, user_id, room, date, reported_by_user, reported_by_user_id from TRACK_PLAY where send_data = ? and data_play_id is null order by date limit 1', [1], function(tx2, rs) {
+					tx.executeSql('select id, artist, title, album, user, user_id, room, date, reported_by_user, reported_by_user_id from TRACK_PLAY where send_data = ? and artist <> "" and title <> "" and data_play_id is null order by date limit 1', [1], function(tx2, rs) {
 						if(rs.rows.length == 1) {
 							var row = rs.rows.item(0);
 							lrdata.sendTrackData(row, function(data) {
