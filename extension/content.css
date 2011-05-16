@@ -32,8 +32,8 @@ div#addons_lastfmlogin {
 
 div#addons_settings, div#addons_changelog {
 	margin-top: 20px;
-	width: 350px;
-	margin-left: -195px;
+	width: 400px;
+	margin-left: -220px;
 }
 
 div#addons_charts {
@@ -47,6 +47,7 @@ div#addons_settings_div, div#addons_changelog_div, div#addons_charts_div {
 	overflow: auto;
 	margin-bottom: 20px;
 	text-align: left;
+	padding-right: 10px;
 }
 
 div#addons_changelog_div ul, div#addons_changelog_div li {

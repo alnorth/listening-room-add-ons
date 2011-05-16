@@ -108,6 +108,7 @@ function hideDimmer() {
 
 function showSettings() {
 	showDimmer(hideSettings);
+	$("#addons_settings_div").height($(p).height() - 220);
 	$("#addons_settings").show();
 }
 
@@ -162,6 +163,7 @@ function loadSettings() {
 
 function showChangelog() {
 	showDimmer(hideChangelog);
+	$("#addons_changelog_div").height($(p).height() - 220);
 	$("#addons_changelog").show();
 }
 
