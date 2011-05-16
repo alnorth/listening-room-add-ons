@@ -40,18 +40,36 @@ function getTrackStartTimestamp(trackId) {
 		timestamp = (new Date()).getTime();
 	}
 	return timestamp;
-	
 }
 
-function addTrackToDB(id) {
+function loadSpinsData() {
+	if(settings.senddata) {
+		var url = "/room/"+ p.room.id +"/spins.json";
+		var process = function(data) {
+			var i = 50;
+			while(data.length > 0 && i > 0) {
+				addTrackToDB(data.pop(), false);
+				i--;
+			}
+			setTimeout(function() {process(data);}, 0);
+		};
+		
+		$.getJSON(url, process);
+	}
+}
+
+function addTrackToDBByID(id) {
 	var track = p.room.tracks[id];
+	addTrackToDB(track, true);
+}
+
+function addTrackToDB(track, displayed) {
 	var user = p.room.normalizedUsersById[track.userId];
 	var trackData = {
-		id: id,
-		filename: track.upload.originalFilename,
+		id: track.id,
 		userId: track.userId,
 		room: p.room.id,
-		timestamp: getTrackStartTimestamp(id),
+		timestamp: track.startTime || getTrackStartTimestamp(track.id),
 		reportedByUser: p.room.user.name,
 		reportedByUserId: p.room.user.id
 	};
@@ -65,9 +83,12 @@ function addTrackToDB(id) {
 			trackData.album = track.metadata.album;
 		}
 	}
-	chrome.extension.sendRequest({type: "addtracktodb", track: trackData, isCurrent: (id == p.room.nowPlaying)}, function(response) {
+	if(track.upload) {
+		trackData.filename = track.upload.originalFilename;
+	}
+	chrome.extension.sendRequest({type: "addtracktodb", track: trackData, isCurrent: (track.id == p.room.nowPlaying)}, function(response) {
 		//Once it's been added to the DB we get the data back again to load into our cache.
-		fetchTrackInfo(id)
+		fetchTrackInfo(track.id)
 	});
 }
 
@@ -216,7 +237,7 @@ function checkForNewTracks() {
 		var dataDiv = "<div id=\"addons_trackdata_"+ trackId +"\" class=\"addons_trackdata\"></div>";
 		$(this).find("div.description").append(dataDiv);
 		
-		addTrackToDB(trackId);
+		addTrackToDBByID(trackId);
 	});
 }
 
@@ -447,6 +468,7 @@ function init() {
 	});
 	
 	setInterval(pulse, 1000);
+	setTimeout(loadSpinsData, 10000);
 	chrome.extension.onRequest.addListener(processMessage);
 }
 
