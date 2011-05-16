@@ -49,9 +49,11 @@
 					}
 				}, sqlError);
 				
+				// Delete all tracks over a day old.
+				// We don't delete tracks that still need to be scrobbled or sent to the data server.
 				var now = (new Date()).getTime();
 				var yesterday = now - 24*60*60*1000;
-				tx.executeSql('delete from TRACK_PLAY where date < ? and lastfm_status <> ?', [yesterday, lastfmStatus.WAITING_FOR_SCROBBLING], ignore, sqlError);
+				tx.executeSql('delete from TRACK_PLAY where date < ? and lastfm_status <> ? and (send_data = 0 or artist = "" or title = "" or data_play_id is not null)', [yesterday, lastfmStatus.WAITING_FOR_SCROBBLING], ignore, sqlError);
 			});
 		}
 		
@@ -359,7 +361,7 @@
 		function sendOldestUnsentData() {
 			if(settings.senddata) {
 				db.transaction(function(tx) {
-					tx.executeSql('select id, artist, title, album, user, user_id, room, date, reported_by_user, reported_by_user_id from TRACK_PLAY where send_data = ? and artist <> "" and title <> "" and data_play_id is null order by date limit 1', [1], function(tx2, rs) {
+					tx.executeSql('select id, artist, title, album, user, user_id, room, date, reported_by_user, reported_by_user_id from TRACK_PLAY where send_data = 1 and artist <> "" and title <> "" and data_play_id is null order by date limit 1', [], function(tx2, rs) {
 						if(rs.rows.length == 1) {
 							var row = rs.rows.item(0);
 							lrdata.sendTrackData(row, function(data) {
