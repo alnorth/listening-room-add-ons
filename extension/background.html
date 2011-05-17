@@ -85,6 +85,11 @@
 				tx.executeSql('update DB_DATA set version = 4', [], ignore, sqlError);
 				currentVersion = 4;
 			}
+			if(currentVersion == 4) {
+				tx.executeSql('create table if not exists USER(id text, username text)', [], ignore, sqlError);
+				tx.executeSql('update DB_DATA set version = 5', [], ignore, sqlError);
+				currentVersion = 5;
+			}
 
 		}
 		
@@ -104,15 +109,15 @@
 			db.transaction(function(tx) {
 				tx.executeSql('select count(*) as num from TRACK_PLAY where id = ?', [trackData.id], function(tx2, rs) {
 						if(rs.rows.item(0)["num"] == 0) {
+							setUserData(trackData.userId, trackData.user);
 							tx2.executeSql('insert into TRACK_PLAY ' +
-								'(id, artist, title, album, filename, user, date, lastfm_status, lastfm_url, user_id, room, reported_by_user, reported_by_user_id, send_data)' + 
-								'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+								'(id, artist, title, album, filename, date, lastfm_status, lastfm_url, user_id, room, reported_by_user, reported_by_user_id, send_data)' + 
+								'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
 								[trackData.id,
 									undefinedToBlank(trackData.artist),
 									undefinedToBlank(trackData.title),
 									undefinedToBlank(trackData.album),
 									undefinedToBlank(trackData.filename),
-									undefinedToBlank(trackData.user),
 									trackData.timestamp,
 									lastfmSession && isCurrent ? lastfmStatus.UNSENT : lastfmStatus.SCROBBLING_DISABLED,
 									'',
@@ -157,7 +162,7 @@
 		function getTrackInfo(trackId, fetchMissingData, callback) {
 			db.transaction(function(tx) {
 				var info = {};
-				tx.executeSql('select lastfm_status, lastfm_url, lastfm_loved, album_art, title, artist, album, user, user_id from TRACK_PLAY where id = ?', [trackId], function(tx, rs) {
+				tx.executeSql('select lastfm_status, lastfm_url, lastfm_loved, album_art, title, artist, album, user_id, u.username from TRACK_PLAY p join USER u on u.id = p.user_id where p.id = ?', [trackId], function(tx, rs) {
 					if(rs.rows.length == 1) {
 						var albumArt = rs.rows.item(0)["album_art"];
 						if((!albumArt || albumArt == "") && fetchMissingData) {
@@ -193,7 +198,7 @@
 						}
 						info.lastfmstatus = rs.rows.item(0)["lastfm_status"];
 						info.lastfmloved = (rs.rows.item(0)["lastfm_loved"] == lastfmLovedStatus.LOVE_SENT || rs.rows.item(0)["lastfm_loved"] == lastfmLovedStatus.LOVE_ACKNOWLEDGED);
-						info.user = rs.rows.item(0)["user"];
+						info.user = rs.rows.item(0)["username"];
 						info.userId = rs.rows.item(0)["user_id"];
 						
 						callback(info);
@@ -268,6 +273,9 @@
 			} else if(request.type == "settrackloved") {
 				setTrackLoved(request.id, request.title, request.artist);
 				sendResponse({});
+			} else if(request.type == "initroom") {
+				initRoom(request.room);
+				sendResponse({});
 			}
 		}
 		
@@ -316,6 +324,29 @@
 			settings.showlastfmlovebutton = (!showlastfmlovebutton || showlastfmlovebutton == "true");
 		}
 		
+		function setUserData(id, username) {
+			db.transaction(function(tx) {
+				tx.executeSql('select username from USER where id = ?', [id], function(tx, rs) {
+					if(rs.rows.length == 1) {
+						if(!rs.rows.item(0)["username"] || rs.rows.item(0)["username"] == "") {
+							tx.executeSql('update USER set username = ? where id = ?', [username, id], ignore, sqlError);
+						}
+					} else {
+						tx.executeSql('insert into USER(id, username) values (?, ?)', [id, username], ignore, sqlError);
+					}
+				}, sqlError);
+			});
+		}
+		
+		function initRoom(room) {
+			// Update the USER table with users from this room.
+			lrdata.getUsers(room, function(data) {
+				for(var i = 0; i < data.length; i++) {
+					setUserData(data[i].user_lr_id, data[i].username);
+				}
+			});
+		}
+		
 		function lastFmLoginData(login) {
 			lastfmUsername = login.username;
 						
@@ -361,7 +392,7 @@
 		function sendOldestUnsentData() {
 			if(settings.senddata) {
 				db.transaction(function(tx) {
-					tx.executeSql('select id, artist, title, album, user, user_id, room, date, reported_by_user, reported_by_user_id from TRACK_PLAY where send_data = 1 and artist <> "" and title <> "" and data_play_id is null order by date limit 1', [], function(tx2, rs) {
+					tx.executeSql('select p.id, artist, title, album, user_id, room, date, reported_by_user, reported_by_user_id, u.username from TRACK_PLAY p join USER u on u.id = p.user_id where send_data = 1 and artist <> "" and title <> "" and data_play_id is null order by date limit 1', [], function(tx2, rs) {
 						if(rs.rows.length == 1) {
 							var row = rs.rows.item(0);
 							lrdata.sendTrackData(row, function(data) {

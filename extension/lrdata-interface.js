@@ -10,7 +10,7 @@ function LRDataInterface(hostname, port) {
 					artist: track.artist,
 					title: track.title,
 					album: track.album,
-					user: track.user,
+					user: track.username,
 					userId: track.user_id,
 					room: track.room,
 					timestamp: track.date,
@@ -24,4 +24,16 @@ function LRDataInterface(hostname, port) {
 		}
 	}
 	this.sendTrackData = sendTrackData;
+	
+	function getUsers(room, callback) {
+		var url = "http://"+ hostname +":"+ port +"/v1/all_users.json?callback=?";
+		$.getJSON(
+			url,
+			{room: room},
+			function(data, textStatus, jqXHR) {
+				callback(data);
+			}
+		);
+	}
+	this.getUsers = getUsers;
 }

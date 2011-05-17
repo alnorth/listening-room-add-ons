@@ -472,6 +472,7 @@ function init() {
 	setInterval(pulse, 1000);
 	setTimeout(loadSpinsData, 10000);
 	chrome.extension.onRequest.addListener(processMessage);
+	chrome.extension.sendRequest({type: "initroom", room: p.room.id}, function(response) {});
 }
 
 init();
