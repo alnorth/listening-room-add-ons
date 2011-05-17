@@ -461,7 +461,7 @@ function init() {
 		$("#addons_lastfm_cancel").click(dontDoLastFmLogin);
 	});
 	
-	$("#sponsor").before("<div id=\"addons_links\"></div>");
+	$("#sponsor").after("<div id=\"addons_links\"></div>");
 	chrome.extension.sendRequest({type: "gethtml", url:"links.html"}, function(response) {
 		$("#addons_links").html(response);
 		$("#addons_charts_link").click(showCharts);
