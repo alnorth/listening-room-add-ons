@@ -1,8 +1,10 @@
 function LRDataInterface(hostname, port) {
+
+	var urlRoot = "http://"+ hostname +":"+ port;
 	
 	function sendTrackData(track, callback) {
 		if(track.title && track.title != "" && track.artist && track.artist != "") {
-			var url = "http://"+ hostname +":"+ port +"/addtrackplay/?callback=?";
+			var url = urlRoot +"/addtrackplay/?callback=?";
 			$.getJSON(
 				url,
 				{
@@ -25,8 +27,15 @@ function LRDataInterface(hostname, port) {
 	}
 	this.sendTrackData = sendTrackData;
 	
+	function getTrackImageUrl(title, artist, album) {
+		var url = urlRoot + "/trackimage/?";
+		url += $.param({track_title: title, artist_name: artist, album_name: album});
+		return url;
+	}
+	this.getTrackImageUrl = getTrackImageUrl;
+	
 	function getUsers(room, callback) {
-		var url = "http://"+ hostname +":"+ port +"/v1/all_users.json?callback=?";
+		var url = urlRoot +"/v1/all_users.json?callback=?";
 		$.getJSON(
 			url,
 			{room: room},
@@ -36,4 +45,5 @@ function LRDataInterface(hostname, port) {
 		);
 	}
 	this.getUsers = getUsers;
+	
 }
