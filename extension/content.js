@@ -51,7 +51,9 @@ function loadSpinsData() {
 				addTrackToDB(data.pop(), false);
 				i--;
 			}
-			setTimeout(function() {process(data);}, 0);
+			if(i == 0) {
+				setTimeout(function() {process(data);}, 0);
+			}
 		};
 		
 		$.getJSON(url, process);
