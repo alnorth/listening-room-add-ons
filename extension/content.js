@@ -88,7 +88,7 @@ function addTrackToDB(track, displayed) {
 	if(track.upload) {
 		trackData.filename = track.upload.originalFilename;
 	}
-	chrome.extension.sendRequest({type: "addtracktodb", track: trackData, isCurrent: (track.id == p.room.nowPlaying)}, function(response) {
+	chrome.extension.sendRequest({type: "addtracktodb", track: trackData, isCurrent: (track.id == p.room.nowPlaying), displayed: displayed}, function(response) {
 		//Once it's been added to the DB we get the data back again to load into our cache.
 		fetchTrackInfo(track.id)
 	});
