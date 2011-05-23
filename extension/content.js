@@ -90,7 +90,9 @@ function addTrackToDB(track, displayed) {
 	}
 	chrome.extension.sendRequest({type: "addtracktodb", track: trackData, isCurrent: (track.id == p.room.nowPlaying), displayed: displayed}, function(response) {
 		//Once it's been added to the DB we get the data back again to load into our cache.
-		fetchTrackInfo(track.id)
+		if(displayed) {
+			fetchTrackInfo(track.id);
+		}
 	});
 }
 
