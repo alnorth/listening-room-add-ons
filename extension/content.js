@@ -48,6 +48,8 @@ function loadSpinsData() {
 		var process = function(data) {
 			var i = 50;
 			while(data.length > 0 && i > 0) {
+				console.log("i: " + i);
+				console.log("data.length: " + data.length);
 				addTrackToDB(data.pop(), false);
 				i--;
 			}
