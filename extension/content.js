@@ -122,7 +122,6 @@ function hideSettings() {
 function saveSettings() {
 	settings = {};
 	settings.hidechat = document.getElementById("addons_settings_hidechat").checked;
-	settings.showuploader = document.getElementById("addons_settings_showuploader").checked;
 	settings.albumart = document.getElementById("addons_settings_albumart").checked;
 	settings.twitterusernamelinks = document.getElementById("addons_settings_twitterusernamelinks").checked;
 	settings.showchattimestamps = document.getElementById("addons_settings_showchattimestamps").checked;
@@ -146,7 +145,6 @@ function saveSettings() {
 function loadSettings() {
 	chrome.extension.sendRequest({type: "getsettings"}, function(newSettings) {
 		document.getElementById("addons_settings_hidechat").checked = newSettings.hidechat;
-		document.getElementById("addons_settings_showuploader").checked = newSettings.showuploader;
 		document.getElementById("addons_settings_albumart").checked = newSettings.albumart;
 		document.getElementById("addons_settings_twitterusernamelinks").checked = newSettings.twitterusernamelinks;
 		document.getElementById("addons_settings_showchattimestamps").checked = newSettings.showchattimestamps;
@@ -284,19 +282,6 @@ function updateSingleTrackData(trackId, el) {
 	if(trackInfo) {
 		if(trackInfo.albumArt && trackInfo.albumArt != "none") {
 			setRecordImage(trackId, resizedImage(190, trackInfo.albumArt));
-		}
-		if(settings.showuploader) {
-			var user = trackInfo.user;
-			if(user != undefined && user != "") {
-				if(settings.twitterusernamelinks) {
-					var twitterUrl = "http://www.twitter.com/"+ user;
-					trackDataHtml += '<div class="addons_uploader">Uploaded by <span class="username addons_twitter_username" data-username="'+ user +'"><a href="'+ twitterUrl +'" target="_blank">'+ user +'</a></span></div>';
-				} else {
-					trackDataHtml += '<div class="addons_uploader">Uploaded by <span class="username">'+ user +'</span></div>';
-				}
-			} else {
-				trackDataHtml += '<div class="addons_uploader">Uploader has now left the room</div>';
-			}
 		}
 		trackDataHtml += '<div class="addons_track_links">';
 		if(settings.lastfmlink && trackInfo.lastfmurl && trackInfo.lastfmurl != "none") {
