@@ -124,7 +124,6 @@ function hideSettings() {
 function saveSettings() {
 	settings = {};
 	settings.hidechat = document.getElementById("addons_settings_hidechat").checked;
-	settings.showuploader = document.getElementById("addons_settings_showuploader").checked;
 	settings.albumart = document.getElementById("addons_settings_albumart").checked;
 	settings.twitterusernamelinks = document.getElementById("addons_settings_twitterusernamelinks").checked;
 	settings.showchattimestamps = document.getElementById("addons_settings_showchattimestamps").checked;
@@ -148,7 +147,6 @@ function saveSettings() {
 function loadSettings() {
 	chrome.extension.sendRequest({type: "getsettings"}, function(newSettings) {
 		document.getElementById("addons_settings_hidechat").checked = newSettings.hidechat;
-		document.getElementById("addons_settings_showuploader").checked = newSettings.showuploader;
 		document.getElementById("addons_settings_albumart").checked = newSettings.albumart;
 		document.getElementById("addons_settings_twitterusernamelinks").checked = newSettings.twitterusernamelinks;
 		document.getElementById("addons_settings_showchattimestamps").checked = newSettings.showchattimestamps;
@@ -280,59 +278,49 @@ function updateSingleTrackData(trackId, el) {
 		el = $("div#addons_trackdata_"+ trackId);
 	}
 	var track = p.room.tracks[trackId];
-	var trackDataHtml = "";
 	
-	var trackInfo = storedTrackInfo[trackId];
-	if(trackInfo) {
-		if(trackInfo.albumArt && trackInfo.albumArt != "none") {
-			setRecordImage(trackId, resizedImage(190, trackInfo.albumArt));
-		}
-		if(settings.showuploader) {
-			var user = trackInfo.user;
-			if(user != undefined && user != "") {
-				if(settings.twitterusernamelinks) {
-					var twitterUrl = "http://www.twitter.com/"+ user;
-					trackDataHtml += '<div class="addons_uploader">Uploaded by <span class="username addons_twitter_username" data-username="'+ user +'"><a href="'+ twitterUrl +'" target="_blank">'+ user +'</a></span></div>';
-				} else {
-					trackDataHtml += '<div class="addons_uploader">Uploaded by <span class="username">'+ user +'</span></div>';
-				}
-			} else {
-				trackDataHtml += '<div class="addons_uploader">Uploader has now left the room</div>';
-			}
-		}
-		trackDataHtml += '<div class="addons_track_links">';
-		if(settings.lastfmlink && trackInfo.lastfmurl && trackInfo.lastfmurl != "none") {
-			trackDataHtml += buttonHtml(trackInfo.lastfmurl, chrome.extension.getURL("lastfm_button.png"), "See this track on Last.fm.");
-		}
-		if(settings.showscrobblestatus && trackInfo.lastfmstatus) {
-			var imagePath = "";
-			var titleText = "";
-			if(trackInfo.lastfmstatus == lastfmStatus.UNSENT || trackInfo.lastfmstatus == lastfmStatus.PLAYING_SENT || trackInfo.lastfmstatus == lastfmStatus.WAITING_FOR_SCROBBLING) {
-				imagePath = "notscrobbled.png";
-				titleText = "This track has not been scrobbled yet. This will usually happen when the track finishes playing."
-			} else if(trackInfo.lastfmstatus == lastfmStatus.SCROBBLED) {
-				imagePath = "scrobbled.png";
-				titleText = "This track has been scrobbled."
-			}
-			if(imagePath != "") {
-				trackDataHtml += '<img style="border: 0px;" src="'+ chrome.extension.getURL(imagePath) +'" title="'+ titleText +'"/>'
-			}
-		}
-		if(settings.showlastfmlovebutton && !trackInfo.lastfmloved && track.metadata.title) {
-			trackDataHtml += '<a href="javascript:void(0);" class="addons_lastfm_lovebutton"><img style="border: 0px;" src="'+ chrome.extension.getURL("lovebutton.png") +'" title="Love this track on Last.fm" /></a>'
-		}
-		trackDataHtml += '</div>';
+	if(track && el.length == 1) {
+		var trackDataHtml = "";
 		
-	} else {
-		fetchTrackInfo(trackId);
-	}
-	
-	el.html(trackDataHtml);
-	if(settings.showlastfmlovebutton) {
-		el.find("a.addons_lastfm_lovebutton").click(function() {
-			setTrackLoved(trackId, track.metadata.title, track.metadata.artist);
-			$(this).hide();
-		});
+		var trackInfo = storedTrackInfo[trackId];
+		if(trackInfo) {
+			if(trackInfo.albumArt && trackInfo.albumArt != "none") {
+				setRecordImage(trackId, resizedImage(190, trackInfo.albumArt));
+			}
+			trackDataHtml += '<div class="addons_track_links">';
+			if(settings.lastfmlink && trackInfo.lastfmurl && trackInfo.lastfmurl != "none") {
+				trackDataHtml += buttonHtml(trackInfo.lastfmurl, chrome.extension.getURL("lastfm_button.png"), "See this track on Last.fm.");
+			}
+			if(settings.showscrobblestatus && trackInfo.lastfmstatus) {
+				var imagePath = "";
+				var titleText = "";
+				if(trackInfo.lastfmstatus == lastfmStatus.UNSENT || trackInfo.lastfmstatus == lastfmStatus.PLAYING_SENT || trackInfo.lastfmstatus == lastfmStatus.WAITING_FOR_SCROBBLING) {
+					imagePath = "notscrobbled.png";
+					titleText = "This track has not been scrobbled yet. This will usually happen when the track finishes playing."
+				} else if(trackInfo.lastfmstatus == lastfmStatus.SCROBBLED) {
+					imagePath = "scrobbled.png";
+					titleText = "This track has been scrobbled."
+				}
+				if(imagePath != "") {
+					trackDataHtml += '<img style="border: 0px;" src="'+ chrome.extension.getURL(imagePath) +'" title="'+ titleText +'"/>'
+				}
+			}
+			if(settings.showlastfmlovebutton && !trackInfo.lastfmloved && track.metadata.title) {
+				trackDataHtml += '<a href="javascript:void(0);" class="addons_lastfm_lovebutton"><img style="border: 0px;" src="'+ chrome.extension.getURL("lovebutton.png") +'" title="Love this track on Last.fm" /></a>'
+			}
+			trackDataHtml += '</div>';
+			
+		} else {
+			fetchTrackInfo(trackId);
+		}
+		
+		el.html(trackDataHtml);
+		if(settings.showlastfmlovebutton) {
+			el.find("a.addons_lastfm_lovebutton").click(function() {
+				setTrackLoved(trackId, track.metadata.title, track.metadata.artist);
+				$(this).hide();
+			});
+		}
 	}
 }
 
@@ -388,7 +376,7 @@ function addTrackDataDiv(html, track, opt_userP) {
 
 function linkifyTwitterNames() {
 	if(settings.twitterusernamelinks) {
-		$(".username:not(.addons_twitter_username), li.user span.name:not(.addons_twitter_username)").each(function(index){
+		$(".username:not(.addons_twitter_username), li.user span.name:not(.addons_twitter_username),  p.addedUser > a:not(.addons_twitter_username)").each(function(index){
 			$(this).addClass("addons_twitter_username");
 			var username = this.innerHTML;
 			this.dataset.username = username;
@@ -400,7 +388,7 @@ function linkifyTwitterNames() {
 
 function removeTwitterLinksIfNecessary() {
 	if(!settings.twitterusernamelinks) {
-		$(".username.addons_twitter_username, span.name.addons_twitter_username").each(function(index){
+		$(".username.addons_twitter_username, span.name.addons_twitter_username, a.addons_twitter_username").each(function(index){
 			$(this).removeClass("addons_twitter_username");
 			this.innerHTML = this.dataset.username;
 		});
