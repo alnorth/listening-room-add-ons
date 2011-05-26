@@ -371,7 +371,7 @@ function addTrackDataDiv(html, track, opt_userP) {
 
 function linkifyTwitterNames() {
 	if(settings.twitterusernamelinks) {
-		$(".username:not(.addons_twitter_username), li.user span.name:not(.addons_twitter_username)").each(function(index){
+		$(".username:not(.addons_twitter_username), li.user span.name:not(.addons_twitter_username),  p.addedUser > a:not(.addons_twitter_username)").each(function(index){
 			$(this).addClass("addons_twitter_username");
 			var username = this.innerHTML;
 			this.dataset.username = username;
@@ -383,7 +383,7 @@ function linkifyTwitterNames() {
 
 function removeTwitterLinksIfNecessary() {
 	if(!settings.twitterusernamelinks) {
-		$(".username.addons_twitter_username, span.name.addons_twitter_username").each(function(index){
+		$(".username.addons_twitter_username, span.name.addons_twitter_username, a.addons_twitter_username").each(function(index){
 			$(this).removeClass("addons_twitter_username");
 			this.innerHTML = this.dataset.username;
 		});
