@@ -276,46 +276,49 @@ function updateSingleTrackData(trackId, el) {
 		el = $("div#addons_trackdata_"+ trackId);
 	}
 	var track = p.room.tracks[trackId];
-	var trackDataHtml = "";
 	
-	var trackInfo = storedTrackInfo[trackId];
-	if(trackInfo) {
-		if(trackInfo.albumArt && trackInfo.albumArt != "none") {
-			setRecordImage(trackId, resizedImage(190, trackInfo.albumArt));
-		}
-		trackDataHtml += '<div class="addons_track_links">';
-		if(settings.lastfmlink && trackInfo.lastfmurl && trackInfo.lastfmurl != "none") {
-			trackDataHtml += buttonHtml(trackInfo.lastfmurl, chrome.extension.getURL("lastfm_button.png"), "See this track on Last.fm.");
-		}
-		if(settings.showscrobblestatus && trackInfo.lastfmstatus) {
-			var imagePath = "";
-			var titleText = "";
-			if(trackInfo.lastfmstatus == lastfmStatus.UNSENT || trackInfo.lastfmstatus == lastfmStatus.PLAYING_SENT || trackInfo.lastfmstatus == lastfmStatus.WAITING_FOR_SCROBBLING) {
-				imagePath = "notscrobbled.png";
-				titleText = "This track has not been scrobbled yet. This will usually happen when the track finishes playing."
-			} else if(trackInfo.lastfmstatus == lastfmStatus.SCROBBLED) {
-				imagePath = "scrobbled.png";
-				titleText = "This track has been scrobbled."
-			}
-			if(imagePath != "") {
-				trackDataHtml += '<img style="border: 0px;" src="'+ chrome.extension.getURL(imagePath) +'" title="'+ titleText +'"/>'
-			}
-		}
-		if(settings.showlastfmlovebutton && !trackInfo.lastfmloved && track.metadata.title) {
-			trackDataHtml += '<a href="javascript:void(0);" class="addons_lastfm_lovebutton"><img style="border: 0px;" src="'+ chrome.extension.getURL("lovebutton.png") +'" title="Love this track on Last.fm" /></a>'
-		}
-		trackDataHtml += '</div>';
+	if(track && el.length == 1) {
+		var trackDataHtml = "";
 		
-	} else {
-		fetchTrackInfo(trackId);
-	}
-	
-	el.html(trackDataHtml);
-	if(settings.showlastfmlovebutton) {
-		el.find("a.addons_lastfm_lovebutton").click(function() {
-			setTrackLoved(trackId, track.metadata.title, track.metadata.artist);
-			$(this).hide();
-		});
+		var trackInfo = storedTrackInfo[trackId];
+		if(trackInfo) {
+			if(trackInfo.albumArt && trackInfo.albumArt != "none") {
+				setRecordImage(trackId, resizedImage(190, trackInfo.albumArt));
+			}
+			trackDataHtml += '<div class="addons_track_links">';
+			if(settings.lastfmlink && trackInfo.lastfmurl && trackInfo.lastfmurl != "none") {
+				trackDataHtml += buttonHtml(trackInfo.lastfmurl, chrome.extension.getURL("lastfm_button.png"), "See this track on Last.fm.");
+			}
+			if(settings.showscrobblestatus && trackInfo.lastfmstatus) {
+				var imagePath = "";
+				var titleText = "";
+				if(trackInfo.lastfmstatus == lastfmStatus.UNSENT || trackInfo.lastfmstatus == lastfmStatus.PLAYING_SENT || trackInfo.lastfmstatus == lastfmStatus.WAITING_FOR_SCROBBLING) {
+					imagePath = "notscrobbled.png";
+					titleText = "This track has not been scrobbled yet. This will usually happen when the track finishes playing."
+				} else if(trackInfo.lastfmstatus == lastfmStatus.SCROBBLED) {
+					imagePath = "scrobbled.png";
+					titleText = "This track has been scrobbled."
+				}
+				if(imagePath != "") {
+					trackDataHtml += '<img style="border: 0px;" src="'+ chrome.extension.getURL(imagePath) +'" title="'+ titleText +'"/>'
+				}
+			}
+			if(settings.showlastfmlovebutton && !trackInfo.lastfmloved && track.metadata.title) {
+				trackDataHtml += '<a href="javascript:void(0);" class="addons_lastfm_lovebutton"><img style="border: 0px;" src="'+ chrome.extension.getURL("lovebutton.png") +'" title="Love this track on Last.fm" /></a>'
+			}
+			trackDataHtml += '</div>';
+			
+		} else {
+			fetchTrackInfo(trackId);
+		}
+		
+		el.html(trackDataHtml);
+		if(settings.showlastfmlovebutton) {
+			el.find("a.addons_lastfm_lovebutton").click(function() {
+				setTrackLoved(trackId, track.metadata.title, track.metadata.artist);
+				$(this).hide();
+			});
+		}
 	}
 }
 
