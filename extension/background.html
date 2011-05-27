@@ -246,7 +246,7 @@
 			} else if(request.type == "getsettings") {
 				sendResponse(settings);
 			} else if(request.type == "gettrackinfo") {
-				getTrackInfo(request.id, request.displayed, function(info) {sendResponse(info);});
+				getTrackInfo(request.id, true, function(info) {sendResponse(info);});
 			} else if(request.type == "settrackloved") {
 				setTrackLoved(request.id, request.title, request.artist);
 				sendResponse({});
