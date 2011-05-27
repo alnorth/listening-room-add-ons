@@ -29,7 +29,7 @@ function LRDataInterface(hostname, port) {
 	
 	function getTrackImageUrl(title, artist, album) {
 		var url = urlRoot + "/trackimage/?";
-		url += $.param({track_title: title, artist_name: artist, album_name: album});
+		url += $.param({title: title, artist: artist, album: album});
 		return url;
 	}
 	this.getTrackImageUrl = getTrackImageUrl;

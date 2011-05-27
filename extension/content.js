@@ -249,10 +249,6 @@ function buttonHtml(url, imagename, titleText) {
 	return '<a href="'+ url +'" target="_blank"><img style="border: 0px;" src="'+ imagename +'" title="'+ titleText +'"/></a>';
 }
 
-function resizedImage(width, url) {
-	return "http://resizer.co?w="+ width +"&img=" + urlEncode(url);
-}
-
 function fetchTrackInfo(trackId) {
 	chrome.extension.sendRequest({type: "gettrackinfo", id:trackId}, function(response) {
 		if(response != undefined) {
@@ -285,7 +281,7 @@ function updateSingleTrackData(trackId, el) {
 		var trackInfo = storedTrackInfo[trackId];
 		if(trackInfo) {
 			if(trackInfo.albumArt && trackInfo.albumArt != "none") {
-				setRecordImage(trackId, resizedImage(190, trackInfo.albumArt));
+				setRecordImage(trackId, trackInfo.albumArt);
 			}
 			trackDataHtml += '<div class="addons_track_links">';
 			if(settings.lastfmlink && trackInfo.lastfmurl && trackInfo.lastfmurl != "none") {
