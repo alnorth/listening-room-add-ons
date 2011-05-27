@@ -140,6 +140,7 @@ function saveSettings() {
 	updateAllTrackData();
 	applyChatHidden();
 	removeRecordImagesIfNecessary();
+	refreshRecordImages();
 	removeTwitterLinksIfNecessary();
 	removeChatTimestampsIfNecessary();
 }
@@ -281,7 +282,7 @@ function updateSingleTrackData(trackId, el) {
 		var trackInfo = storedTrackInfo[trackId];
 		if(trackInfo) {
 			if(trackInfo.albumArt && trackInfo.albumArt != "none") {
-				setRecordImage(trackId, trackInfo.albumArt);
+				refreshRecordImages();
 			}
 			trackDataHtml += '<div class="addons_track_links">';
 			if(settings.lastfmlink && trackInfo.lastfmurl && trackInfo.lastfmurl != "none") {
@@ -334,25 +335,26 @@ function applyChatHidden() {
 }
 
 function removeRecordImagesIfNecessary() {
-	var styleNode = $("style#addons_css_records");
-	if(!settings.albumart && styleNode.length) {
-		styleNode.remove();
-		recordsWithArtInCss = {};
+	if(!settings.albumart) {
+		$('div.recordWithDescription div.record[data-provider="lrdata"]').each(function(index) {
+			$(this).css("background-image", "none");
+		});
 	}
 }
 
-function setRecordImage(trackId, url) {
-	if(settings.albumart && !recordsWithArtInCss[trackId]) {
-		var styleNode = $("style#addons_css_records");
-		if(!styleNode.length) {
-			styleNode = document.createElement("style");
-			styleNode = $(styleNode);
-			styleNode.attr("type", "text/css")
-				.attr("id", "addons_css_records");
-			$("head").append(styleNode);
-		}
-		styleNode.append("div#record-"+ trackId +" div.record {background-image: url("+ url + ");} ");
-		recordsWithArtInCss[trackId] = true;
+function refreshRecordImages() {
+	if(settings.albumart) {
+		$("div.recordWithDescription div.record").each(function(index) {
+			if($(this).css("background-image") == "none") {
+				var trackId = this.parentNode.id.replace("record-", "");
+				var trackInfo = storedTrackInfo[trackId];
+				if(trackInfo) {
+					var url = trackInfo.albumArt.replace(/"/g, '\\"');
+					$(this).css("background-image", "url(\""+ url +"\")");
+					this.dataset.provider = "lrdata";
+				}
+			}
+		});
 	}
 }
 
