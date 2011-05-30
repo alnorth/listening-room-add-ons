@@ -37,7 +37,7 @@
 		function initDB() {
 			db.transaction(function(tx) {
 				tx.executeSql('create table if not exists TRACK_PLAY ' +
-					'(id text, artist text, title text, album text, filename text, user text, date int, lastfm_status int, lastfm_url text)', [], ignore, sqlError);
+					'(id text, artist text, title text, album text, date int, lastfm_status int, lastfm_url text)', [], ignore, sqlError);
 					
 				tx.executeSql('create table if not exists DB_DATA(version int)', [], ignore, sqlError);
 					
@@ -111,13 +111,12 @@
 						if(rs.rows.item(0)["num"] == 0) {
 							setUserData(trackData.userId, trackData.user);
 							tx2.executeSql('insert into TRACK_PLAY ' +
-								'(id, artist, title, album, filename, date, lastfm_status, lastfm_url, user_id, room, reported_by_user, reported_by_user_id, send_data)' + 
-								'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+								'(id, artist, title, album, date, lastfm_status, lastfm_url, user_id, room, reported_by_user, reported_by_user_id, send_data)' + 
+								'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
 								[trackData.id,
 									undefinedToBlank(trackData.artist),
 									undefinedToBlank(trackData.title),
 									undefinedToBlank(trackData.album),
-									undefinedToBlank(trackData.filename),
 									trackData.timestamp,
 									lastfmSession && isCurrent ? lastfmStatus.UNSENT : lastfmStatus.SCROBBLING_DISABLED,
 									'',

@@ -86,9 +86,6 @@ function addTrackToDB(track, displayed) {
 			trackData.album = track.metadata.album;
 		}
 	}
-	if(track.upload) {
-		trackData.filename = track.upload.originalFilename;
-	}
 	chrome.extension.sendRequest({type: "addtracktodb", track: trackData, isCurrent: (track.id == p.room.nowPlaying)}, function(response) {
 		//Once it's been added to the DB we get the data back again to load into our cache.
 		if(displayed) {
