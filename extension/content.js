@@ -3,6 +3,7 @@ pDiv.setAttribute("onclick", "return window;");
 p = pDiv.onclick();
 
 var $ = p.$;
+var lrdata = new LRDataInterface("lrdata.alnorth.com", 8080);
 var settings;
 var storedTrackInfo = {};
 var recordsWithArtInCss = {};
@@ -336,7 +337,7 @@ function applyChatHidden() {
 
 function removeRecordImagesIfNecessary() {
 	if(!settings.albumart) {
-		$('div.recordWithDescription div.record[data-provider="lrdata"]').each(function(index) {
+		$('div.record[data-provider="lrdata"]').each(function(index) {
 			$(this).css("background-image", "none");
 		});
 	}
@@ -350,6 +351,19 @@ function refreshRecordImages() {
 				var trackInfo = storedTrackInfo[trackId];
 				if(trackInfo) {
 					var url = trackInfo.albumArt.replace(/"/g, '\\"');
+					$(this).css("background-image", "url(\""+ url +"\")");
+					this.dataset.provider = "lrdata";
+				}
+			}
+		});
+		
+		$("li.user.current-user div.record.mini-record").each(function(index) {
+			if($(this).css("background-image") == "none") {
+				var trackId = p.room.normalizedUsersById[p.room.user.id].tracks[index];
+				var track = p.room.tracks[trackId];
+				if(track && track.metadata && track.metadata.title && track.metadata.artist && track.metadata.album) {
+					var url = lrdata.getTrackImageUrl(track.metadata.title, track.metadata.artist, track.metadata.album);
+					url = url.replace(/"/g, '\\"');
 					$(this).css("background-image", "url(\""+ url +"\")");
 					this.dataset.provider = "lrdata";
 				}
@@ -433,6 +447,7 @@ function pulse() {
 	checkForNewTracks();
 	linkifyTwitterNames();
 	checkForNewChatMessages();
+	refreshRecordImages();
 }
 
 function init() {
