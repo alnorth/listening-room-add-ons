@@ -125,6 +125,7 @@ function saveSettings() {
 	settings.albumart = document.getElementById("addons_settings_albumart").checked;
 	settings.twitterusernamelinks = document.getElementById("addons_settings_twitterusernamelinks").checked;
 	settings.showchattimestamps = document.getElementById("addons_settings_showchattimestamps").checked;
+	settings.disablerecordspinning = document.getElementById("addons_settings_disablerecordspinning").checked;
 	
 	settings.senddata = document.getElementById("addons_settings_senddata").checked;
 			
@@ -149,6 +150,7 @@ function loadSettings() {
 		document.getElementById("addons_settings_albumart").checked = newSettings.albumart;
 		document.getElementById("addons_settings_twitterusernamelinks").checked = newSettings.twitterusernamelinks;
 		document.getElementById("addons_settings_showchattimestamps").checked = newSettings.showchattimestamps;
+		document.getElementById("addons_settings_disablerecordspinning").checked = newSettings.disablerecordspinning;
 		
 		document.getElementById("addons_settings_senddata").checked = newSettings.senddata;
 		
@@ -460,6 +462,13 @@ function init() {
 		$("#addons_settings_link").click(showSettings);
 		$("#addons_changelog_link").click(showChangelog);
 	});
+	
+	p.Controller.prototype.oldUpdateRecordRotation = p.Controller.prototype.updateRecordRotation;
+	p.Controller.prototype.updateRecordRotation = function() {
+		if(!settings.disablerecordspinning) {
+			this.oldUpdateRecordRotation();
+		}
+	};
 	
 	setInterval(pulse, 1000);
 	setTimeout(loadSpinsData, 10000);
