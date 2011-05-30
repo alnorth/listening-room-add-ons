@@ -282,9 +282,6 @@ function updateSingleTrackData(trackId, el) {
 		
 		var trackInfo = storedTrackInfo[trackId];
 		if(trackInfo) {
-			if(trackInfo.albumArt && trackInfo.albumArt != "none") {
-				refreshRecordImages();
-			}
 			trackDataHtml += '<div class="addons_track_links">';
 			if(settings.lastfmlink && trackInfo.lastfmurl && trackInfo.lastfmurl != "none") {
 				trackDataHtml += buttonHtml(trackInfo.lastfmurl, chrome.extension.getURL("lastfm_button.png"), "See this track on Last.fm.");
@@ -345,21 +342,14 @@ function removeRecordImagesIfNecessary() {
 
 function refreshRecordImages() {
 	if(settings.albumart) {
-		$("div.recordWithDescription div.record").each(function(index) {
+		$("div.recordWithDescription div.record, li.user.current-user div.record.mini-record").each(function(index) {
 			if($(this).css("background-image") == "none") {
-				var trackId = this.parentNode.id.replace("record-", "");
-				var trackInfo = storedTrackInfo[trackId];
-				if(trackInfo) {
-					var url = trackInfo.albumArt.replace(/"/g, '\\"');
-					$(this).css("background-image", "url(\""+ url +"\")");
-					this.dataset.provider = "lrdata";
+				var trackId = "";
+				if($(this).hasClass("mini-record")) {
+					trackId = p.room.normalizedUsersById[p.room.user.id].tracks[$(this).index()];
+				} else {
+					trackId = this.parentNode.id.replace("record-", "");
 				}
-			}
-		});
-		
-		$("li.user.current-user div.record.mini-record").each(function(index) {
-			if($(this).css("background-image") == "none") {
-				var trackId = p.room.normalizedUsersById[p.room.user.id].tracks[index];
 				var track = p.room.tracks[trackId];
 				if(track && track.metadata && track.metadata.title && track.metadata.artist && track.metadata.album) {
 					var url = lrdata.getTrackImageUrl(track.metadata.title, track.metadata.artist, track.metadata.album);

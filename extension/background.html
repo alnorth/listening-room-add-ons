@@ -157,7 +157,6 @@
 				var info = {};
 				tx.executeSql('select lastfm_status, lastfm_url, lastfm_loved, title, artist, album, user_id, u.username from TRACK_PLAY p join USER u on u.id = p.user_id where p.id = ?', [trackId], function(tx, rs) {
 					if(rs.rows.length == 1) {
-						info.albumArt = lrdata.getTrackImageUrl(rs.rows.item(0)["title"], rs.rows.item(0)["artist"], rs.rows.item(0)["album"]);
 						
 						var url = rs.rows.item(0)["lastfm_url"];
 						if ((!url || url == "") && fetchMissingData) {
