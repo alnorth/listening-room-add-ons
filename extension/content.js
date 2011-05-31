@@ -377,7 +377,7 @@ function addTrackDataDiv(html, track, opt_userP) {
 
 function linkifyTwitterNames() {
 	if(settings.twitterusernamelinks) {
-		$(".username:not(.addons_twitter_username), li.user span.name:not(.addons_twitter_username),  p.addedUser > a:not(.addons_twitter_username)").each(function(index){
+		$(".username:not(.addons_twitter_username), li.user span.name:not(.addons_twitter_username),  p.addedUser > a:not(.addons_twitter_username):not([href])").each(function(index){
 			$(this).addClass("addons_twitter_username");
 			var username = this.innerHTML;
 			this.dataset.username = username;
