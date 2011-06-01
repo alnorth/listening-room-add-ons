@@ -14,6 +14,14 @@ function LastFmInterface() {
 		};
 	};
 	
+	var urlEncodeCharacter = function(c) {
+		return '%' + c.charCodeAt(0).toString(16);
+	};
+
+	var urlEncode = function(s) {
+		return encodeURIComponent(s).replace(/\%20/g, '+').replace(/[!'()*~]/g, urlEncodeCharacter);
+	};
+	
 	this.clearSession = function() {
 		lastfmSession = undefined;
 	};
@@ -41,8 +49,8 @@ function LastFmInterface() {
 			},
 			error: function(code, message){
 				var newUrl = "none";
-				if(dbData["title"] != "") {
-					newUrl = "http://www.last.fm/search?q=" + urlEncode(dbData["title"] + " - " + dbData["artist"]);
+				if(title !== "") {
+					newUrl = "http://www.last.fm/search?q=" + urlEncode(title + " - " + artist);
 				}
 				callback(newUrl);
 			}
@@ -60,5 +68,5 @@ function LastFmInterface() {
 	
 	this.setNowPlaying = function(artist, title, album, errCallback, callback) {
 		lastfm.track.updateNowPlaying({track: title, artist: artist, album: album}, lastfmSession, {success: callCallback(callback), error: errCallback});
-	}
+	};
 }

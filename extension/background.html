@@ -1,4 +1,4 @@
-<html>
+<html><head>
 	<script type="text/javascript" src="lastfm.api.md5.js"></script>
 	<script type="text/javascript" src="lastfm.api.js"></script>
 	<script type="text/javascript" src="jquery.min.js"></script>
@@ -16,12 +16,12 @@
 			PLAYING_SENT: 1,
 			WAITING_FOR_SCROBBLING: 2,
 			SCROBBLED: 3
-		}
+		};
 		
 		var lastfmLovedStatus = {
 			LOVE_SENT: 1,
 			LOVE_ACKNOWLEDGED: 2
-		}
+		};
 		
 		////////////////////////////
 		
@@ -32,14 +32,6 @@
 		var lfm = new LastFmInterface();
 		var lastfmUsername;
 		var tabsForTracks = {};
-		
-		function urlEncodeCharacter(c) {
-			return '%' + c.charCodeAt(0).toString(16);
-		}
-
-		function urlEncode(s) {
-			return encodeURIComponent( s ).replace( /\%20/g, '+' ).replace( /[!'()*~]/g, urlEncodeCharacter );
-		}
 		
 		function sendUpdatedTrackInfo(trackId) {
 			getTrackInfo(trackId, false, function(info) {
@@ -57,18 +49,18 @@
 			db.getTrackInfo(trackId, sqlError, function(dbData) {
 				if(dbData) {
 					var info = {};
-					var url = dbData["lastfm_url"];
-					if ((!url || url == "") && fetchMissingData) {
-						lfm.getTrackUrl(dbData["artist"], dbData["title"], function(trackUrl) {
+					var url = dbData.lastfm_url;
+					if ((!url || url === "") && fetchMissingData) {
+						lfm.getTrackUrl(dbData.artist, dbData.title, function(trackUrl) {
 							db.saveLastfmUrl(trackId, trackUrl, sqlError, sendUpdatedCallback(trackId));
 						});
 					} else {
 						info.lastfmurl = url;
 					}
-					info.lastfmstatus = dbData["lastfm_status"];
-					info.lastfmloved = (dbData["lastfm_loved"] == lastfmLovedStatus.LOVE_SENT || dbData["lastfm_loved"] == lastfmLovedStatus.LOVE_ACKNOWLEDGED);
-					info.user = dbData["username"];
-					info.userId = dbData["user_id"];
+					info.lastfmstatus = parseInt(dbData.lastfm_status, 10);
+					info.lastfmloved = (parseInt(dbData.lastfm_loved, 10) === lastfmLovedStatus.LOVE_SENT || parseInt(dbData.lastfm_loved, 10) === lastfmLovedStatus.LOVE_ACKNOWLEDGED);
+					info.user = dbData.username;
+					info.userId = dbData.user_id;
 					
 					callback(info);
 				} else {
@@ -105,7 +97,7 @@
 		}
 		
 		function processMessage(request, sender, sendResponse) {
-			if(request.type == "addtracktodb") {
+			if(request.type === "addtracktodb") {
 				tabsForTracks[request.track.id] = sender.tab.id;
 				db.addTrackToDB(request.track, request.isCurrent, lfm.signedIn(), settings.get("senddata"), sqlError);
 				
@@ -116,25 +108,25 @@
 				}
 				
 				sendResponse({"id": request.id});
-			} else if(request.type == "lastfmlogin") {
+			} else if(request.type === "lastfmlogin") {
 				lastFmLoginData(request.login);
 				window.localStorage.setItem("lastfm_username", request.login.username);
 				sendResponse({});
-			} else if(request.type == "gethtml") {
+			} else if(request.type === "gethtml") {
 				$.get(request.url, function(data) {
 					sendResponse(data);
 				});
-			} else if(request.type == "savesettings") {
+			} else if(request.type === "savesettings") {
 				saveSettingsToLocalStorage(request.settings);
 				sendResponse({});
-			} else if(request.type == "getsettings") {
+			} else if(request.type === "getsettings") {
 				sendResponse(settings.toObject());
-			} else if(request.type == "gettrackinfo") {
+			} else if(request.type === "gettrackinfo") {
 				getTrackInfo(request.id, true, function(info) {sendResponse(info);});
-			} else if(request.type == "settrackloved") {
+			} else if(request.type === "settrackloved") {
 				setTrackLoved(request.id, request.title, request.artist);
 				sendResponse({});
-			} else if(request.type == "initroom") {
+			} else if(request.type === "initroom") {
 				initRoom(request.room);
 				sendResponse({});
 			}
@@ -151,7 +143,8 @@
 		function initRoom(room) {
 			// Update the USER table with users from this room.
 			lrdata.getUsers(room, function(data) {
-				for(var i = 0; i < data.length; i++) {
+				var i;
+				for(i = 0; i < data.length; i++) {
 					db.setUserData(data[i].user_lr_id, data[i].username, sqlError, ignore);
 				}
 			});
@@ -179,8 +172,8 @@
 			if(settings.get("scrobble") && lfm.signedIn()) {
 				db.getOldestScrobbleableTrack(sqlError, function(dbData) {
 					if(dbData) {
-						lfm.scrobble(dbData["artist"], dbData["title"], dbData["album"], parseInt(dbData["date"]), lastfmError, function() {
-							db.saveLastFmStatus(dbData["id"], lastfmStatus.SCROBBLED, sqlError, sendUpdatedCallback(dbData["id"]));
+						lfm.scrobble(dbData.artist, dbData.title, dbData.album, parseInt(dbData.date, 10), lastfmError, function() {
+							db.saveLastFmStatus(dbData.id, lastfmStatus.SCROBBLED, sqlError, sendUpdatedCallback(dbData.id));
 						});
 					}
 				});
@@ -192,7 +185,7 @@
 				db.getOldestUnsentData(sqlError, function(dbData) {
 					if(dbData) {
 						lrdata.sendTrackData(dbData, function(data) {
-							db.saveLRDBData(dbData["id"], data, sqlError, ignore);
+							db.saveLRDBData(dbData.id, data, sqlError, ignore);
 						});
 					}
 				});
@@ -216,5 +209,5 @@
 		
 		init();
 	</script>
-</html>
+</head></html>
 

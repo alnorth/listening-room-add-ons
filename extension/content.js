@@ -1,6 +1,6 @@
 var pDiv = document.createElement("div");
 pDiv.setAttribute("onclick", "return window;");
-p = pDiv.onclick();
+var p = pDiv.onclick();
 
 var $ = p.$;
 var lrdata = new LRDataInterface("lrdata.alnorth.com", 8080);
@@ -17,27 +17,20 @@ var lastfmStatus = {
 	PLAYING_SENT: 1,
 	WAITING_FOR_SCROBBLING: 2,
 	SCROBBLED: 3
-}
+};
 
 ////////////////////////////
 
-function urlEncodeCharacter(c) {
-	return '%' + c.charCodeAt(0).toString(16);
-}
-
-function urlEncode(s) {
-    return encodeURIComponent( s ).replace( /\%20/g, '+' ).replace( /[!'()*~]/g, urlEncodeCharacter );
-}
-
 function getTrackStartTimestamp(trackId) {
 	var timestamp = null;
-	for(var i = p.room.history.length - 1; i >= 0; i--) {
-		var h = p.room.history[i];
-		if(h.event == "trackStart" && h.data == trackId) {
+	var i, h;
+	for(i = p.room.history.length - 1; i >= 0; i--) {
+		h = p.room.history[i];
+		if(h.event === "trackStart" && h.data === trackId) {
 			timestamp = h.timestamp;
 		}
 	}
-	if(timestamp == null) {
+	if(timestamp === null) {
 		timestamp = (new Date()).getTime();
 	}
 	return timestamp;
@@ -52,7 +45,7 @@ function loadSpinsData() {
 				addTrackToDB(data.shift(), false);
 				i--;
 			}
-			if(i == 0) {
+			if(i === 0) {
 				setTimeout(function() {process(data);}, 0);
 			}
 		};
@@ -76,17 +69,17 @@ function addTrackToDB(track, displayed) {
 		reportedByUser: p.room.user.name,
 		reportedByUserId: p.room.user.id
 	};
-	if(user != undefined) {
+	if(user !== undefined) {
 		trackData.user = user.name;
 	}
-	if(track.metadata.artist != undefined && track.metadata.title != undefined) {
+	if(track.metadata.artist !== undefined && track.metadata.title !== undefined) {
 		trackData.title = track.metadata.title;
 		trackData.artist = track.metadata.artist;
-		if(track.metadata.album != undefined) {
+		if(track.metadata.album !== undefined) {
 			trackData.album = track.metadata.album;
 		}
 	}
-	chrome.extension.sendRequest({type: "addtracktodb", track: trackData, isCurrent: (track.id == p.room.nowPlaying)}, function(response) {
+	chrome.extension.sendRequest({type: "addtracktodb", track: trackData, isCurrent: (track.id === p.room.nowPlaying)}, function(response) {
 		//Once it's been added to the DB we get the data back again to load into our cache.
 		if(displayed) {
 			fetchTrackInfo(track.id);
@@ -139,6 +132,7 @@ function saveSettings() {
 
 function loadSettings() {
 	chrome.extension.sendRequest({type: "getsettings"}, function(newSettings) {
+		var key;
 		for (key in newSettings) {
 			if (newSettings.hasOwnProperty(key)) {
 				document.getElementById("addons_settings_" + key).checked = newSettings[key];
@@ -204,13 +198,13 @@ function hideCharts() {
 }
 
 function processMessage(request, sender, sendResponse) {
-	if(request.type == "lastfmloginneeded") {
-		if(request.lastfmUsername && $("#addons_lastfm_username").val() == "") {
+	if(request.type === "lastfmloginneeded") {
+		if(request.lastfmUsername && $("#addons_lastfm_username").val() === "") {
 			$("#addons_lastfm_username").val(request.lastfmUsername);
 		}
 		showLastFmLogin();
 		sendResponse({});
-	} else if(request.type = "updatedtrackinfo") {
+	} else if(request.type === "updatedtrackinfo") {
 		updatedTrackInfo(request.id, request.info);
 		sendResponse({});
 	}
@@ -238,7 +232,7 @@ function buttonHtml(url, imagename, titleText) {
 
 function fetchTrackInfo(trackId) {
 	chrome.extension.sendRequest({type: "gettrackinfo", id:trackId}, function(response) {
-		if(response != undefined) {
+		if(response !== undefined) {
 			updatedTrackInfo(trackId, response);
 		}
 	});
@@ -262,31 +256,31 @@ function updateSingleTrackData(trackId, el) {
 	}
 	var track = p.room.tracks[trackId];
 	
-	if(track && el.length == 1) {
+	if(track && el.length === 1) {
 		var trackDataHtml = "";
 		
 		var trackInfo = storedTrackInfo[trackId];
 		if(trackInfo) {
 			trackDataHtml += '<div class="addons_track_links">';
-			if(settings.lastfmlink && trackInfo.lastfmurl && trackInfo.lastfmurl != "none") {
+			if(settings.lastfmlink && trackInfo.lastfmurl && trackInfo.lastfmurl !== "none") {
 				trackDataHtml += buttonHtml(trackInfo.lastfmurl, chrome.extension.getURL("lastfm_button.png"), "See this track on Last.fm.");
 			}
 			if(settings.showscrobblestatus && trackInfo.lastfmstatus) {
 				var imagePath = "";
 				var titleText = "";
-				if(trackInfo.lastfmstatus == lastfmStatus.UNSENT || trackInfo.lastfmstatus == lastfmStatus.PLAYING_SENT || trackInfo.lastfmstatus == lastfmStatus.WAITING_FOR_SCROBBLING) {
+				if(trackInfo.lastfmstatus === lastfmStatus.UNSENT || trackInfo.lastfmstatus === lastfmStatus.PLAYING_SENT || trackInfo.lastfmstatus === lastfmStatus.WAITING_FOR_SCROBBLING) {
 					imagePath = "notscrobbled.png";
-					titleText = "This track has not been scrobbled yet. This will usually happen when the track finishes playing."
-				} else if(trackInfo.lastfmstatus == lastfmStatus.SCROBBLED) {
+					titleText = "This track has not been scrobbled yet. This will usually happen when the track finishes playing.";
+				} else if(trackInfo.lastfmstatus === lastfmStatus.SCROBBLED) {
 					imagePath = "scrobbled.png";
-					titleText = "This track has been scrobbled."
+					titleText = "This track has been scrobbled.";
 				}
-				if(imagePath != "") {
-					trackDataHtml += '<img style="border: 0px;" src="'+ chrome.extension.getURL(imagePath) +'" title="'+ titleText +'"/>'
+				if(imagePath !== "") {
+					trackDataHtml += '<img style="border: 0px;" src="'+ chrome.extension.getURL(imagePath) +'" title="'+ titleText +'"/>';
 				}
 			}
 			if(settings.showlastfmlovebutton && !trackInfo.lastfmloved && track.metadata.title) {
-				trackDataHtml += '<a href="javascript:void(0);" class="addons_lastfm_lovebutton"><img style="border: 0px;" src="'+ chrome.extension.getURL("lovebutton.png") +'" title="Love this track on Last.fm" /></a>'
+				trackDataHtml += '<a href="javascript:void(0);" class="addons_lastfm_lovebutton"><img style="border: 0px;" src="'+ chrome.extension.getURL("lovebutton.png") +'" title="Love this track on Last.fm" /></a>';
 			}
 			trackDataHtml += '</div>';
 			
@@ -328,7 +322,7 @@ function removeRecordImagesIfNecessary() {
 function refreshRecordImages() {
 	if(settings.albumart) {
 		$("div.recordWithDescription div.record, li.user.current-user div.record.mini-record").each(function(index) {
-			if($(this).css("background-image") == "none") {
+			if($(this).css("background-image") === "none") {
 				var trackId = "";
 				if($(this).hasClass("mini-record")) {
 					trackId = p.room.normalizedUsersById[p.room.user.id].tracks[$(this).index()];
@@ -349,16 +343,6 @@ function refreshRecordImages() {
 
 function setTrackLoved(trackId, title, artist) {
 	chrome.extension.sendRequest({type: "settrackloved", id:trackId, title: title, artist: artist}, function(response) {});
-}
-
-function addTrackDataDiv(html, track, opt_userP) {
-	var dataDiv = "<div id=\"addons_trackdata_"+ track.id +"\" class=\"addons_trackdata\"></div>";
-
-	var jHtml = $(html);
-	jHtml.find("div.description").append(dataDiv);
-	html = $('<div>').append(jHtml.clone()).remove().html();
-
-	return html;
 }
 
 function linkifyTwitterNames() {
@@ -383,8 +367,8 @@ function removeTwitterLinksIfNecessary() {
 }
 
 function zeroPadTime(num) {
-	var str = new String(num);
-	return str.length == 2 ? str : "0" + str;
+	var str = num.toString();
+	return str.length === 2 ? str : "0" + str;
 }
 
 function checkForNewChatMessages() {

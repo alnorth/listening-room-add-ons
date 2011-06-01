@@ -24,7 +24,7 @@ function Settings(ls) {
 	var get = function(key) {
 		var value = ls.getItem(key);
 		if(value) {
-			return (value == "true");
+			return (value === "true");
 		} else {
 			return defaults[key];
 		}
@@ -32,6 +32,7 @@ function Settings(ls) {
 	this.get = get;
 	
 	this.fromObject = function(o) {
+		var key;
 		for (key in defaults) {
 			if (defaults.hasOwnProperty(key)) {
 				set(key, o[key]);
@@ -41,6 +42,7 @@ function Settings(ls) {
 	
 	this.toObject = function() {
 		var o = {};
+		var key;
 		for (key in defaults) {
 			if (defaults.hasOwnProperty(key)) {
 				o[key] = get(key);
