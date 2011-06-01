@@ -3,7 +3,7 @@ function LRDataInterface(hostname, port) {
 	var urlRoot = "http://"+ hostname +":"+ port;
 	
 	function sendTrackData(track, callback) {
-		if(track.title && track.title != "" && track.artist && track.artist != "") {
+		if(track.title && track.title !== "" && track.artist && track.artist !== "") {
 			var url = urlRoot +"/addtrackplay/?callback=?";
 			$.getJSON(
 				url,
