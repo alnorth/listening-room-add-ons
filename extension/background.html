@@ -2,6 +2,8 @@
 	<script type="text/javascript" src="lastfm.api.md5.js"></script>
 	<script type="text/javascript" src="lastfm.api.js"></script>
 	<script type="text/javascript" src="jquery.min.js"></script>
+	
+	<script type="text/javascript" src="background-db.js"></script>
 	<script type="text/javascript" src="lrdata-interface.js"></script>
 	<script>
 		////////////////////////////Enums
@@ -21,7 +23,7 @@
 		
 		////////////////////////////
 		
-		var db = openDatabase("listeningroom-addons-data", "", "Listening Room Addons data", 1048576);
+		var db = new Database();
 		var currentTrack;
 		var lastfm = new LastFM({
 			apiKey    : 'c0db7c8bfb98655ab25aa2e959fdcc68',
@@ -34,69 +36,6 @@
 		var lastfmSession;
 		var tabsForTracks = {};
 		
-		function initDB() {
-			db.transaction(function(tx) {
-				tx.executeSql('create table if not exists TRACK_PLAY ' +
-					'(id text, artist text, title text, album text, date int, lastfm_status int, lastfm_url text)', [], ignore, sqlError);
-					
-				tx.executeSql('create table if not exists DB_DATA(version int)', [], ignore, sqlError);
-					
-				tx.executeSql('SELECT version FROM DB_DATA', [], function(tx, rs) {
-					if(rs.rows.length == 0) {
-						updateDB(tx, 0);
-					} else {
-						updateDB(tx, rs.rows.item(0)["version"]);
-					}
-				}, sqlError);
-				
-				// Delete all tracks over a day old.
-				// We don't delete tracks that still need to be scrobbled or sent to the data server.
-				var now = (new Date()).getTime();
-				var yesterday = now - 24*60*60*1000;
-				tx.executeSql('delete from TRACK_PLAY where date < ? and lastfm_status <> ? and (send_data = 0 or artist = "" or title = "" or data_play_id is not null)', [yesterday, lastfmStatus.WAITING_FOR_SCROBBLING], ignore, sqlError);
-			});
-		}
-		
-		function updateDB(tx, currentVersion) {
-			if(currentVersion == 0) {
-				tx.executeSql('insert into DB_DATA(version) values (1)', [], ignore, sqlError);
-				tx.executeSql('alter table TRACK_PLAY add column lastfm_loved int', [], ignore, sqlError);
-				currentVersion = 1;
-			}
-			if(currentVersion == 1) {
-				tx.executeSql('alter table TRACK_PLAY add column album_art text', [], ignore, sqlError);
-				tx.executeSql('update DB_DATA set version = 2', [], ignore, sqlError);
-				currentVersion = 2;
-			}
-			if(currentVersion == 2) {
-				tx.executeSql('alter table TRACK_PLAY add column user_id text', [], ignore, sqlError);
-				tx.executeSql('alter table TRACK_PLAY add column room text', [], ignore, sqlError);
-				tx.executeSql('update DB_DATA set version = 3', [], ignore, sqlError);
-				currentVersion = 3;
-			}
-			if(currentVersion == 3) {
-				tx.executeSql('alter table TRACK_PLAY add column reported_by_user text', [], ignore, sqlError);
-				tx.executeSql('alter table TRACK_PLAY add column reported_by_user_id text', [], ignore, sqlError);
-				tx.executeSql('alter table TRACK_PLAY add column send_data int', [], ignore, sqlError);
-				tx.executeSql('update TRACK_PLAY set send_data = 0', [], ignore, sqlError);
-				tx.executeSql('alter table TRACK_PLAY add column data_track_id int', [], ignore, sqlError);
-				tx.executeSql('alter table TRACK_PLAY add column data_artist_id int', [], ignore, sqlError);
-				tx.executeSql('alter table TRACK_PLAY add column data_play_id int', [], ignore, sqlError);
-				tx.executeSql('update DB_DATA set version = 4', [], ignore, sqlError);
-				currentVersion = 4;
-			}
-			if(currentVersion == 4) {
-				tx.executeSql('create table if not exists USER(id text, username text)', [], ignore, sqlError);
-				tx.executeSql('update DB_DATA set version = 5', [], ignore, sqlError);
-				currentVersion = 5;
-			}
-
-		}
-		
-		function undefinedToBlank(val) {
-			return val ? val : '';
-		}
-		
 		function urlEncodeCharacter(c) {
 			return '%' + c.charCodeAt(0).toString(16);
 		}
@@ -105,109 +44,66 @@
 			return encodeURIComponent( s ).replace( /\%20/g, '+' ).replace( /[!'()*~]/g, urlEncodeCharacter );
 		}
 		
-		function addTrackToDB(trackData, isCurrent) {
-			db.transaction(function(tx) {
-				tx.executeSql('select count(*) as num from TRACK_PLAY where id = ?', [trackData.id], function(tx2, rs) {
-						if(rs.rows.item(0)["num"] == 0) {
-							setUserData(trackData.userId, trackData.user);
-							tx2.executeSql('insert into TRACK_PLAY ' +
-								'(id, artist, title, album, date, lastfm_status, lastfm_url, user_id, room, reported_by_user, reported_by_user_id, send_data)' + 
-								'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-								[trackData.id,
-									undefinedToBlank(trackData.artist),
-									undefinedToBlank(trackData.title),
-									undefinedToBlank(trackData.album),
-									trackData.timestamp,
-									lastfmSession && isCurrent ? lastfmStatus.UNSENT : lastfmStatus.SCROBBLING_DISABLED,
-									'',
-									trackData.userId,
-									trackData.room,
-									trackData.reportedByUser,
-									trackData.reportedByUserId,
-									settings.senddata ? 1 : 0
-								],
-								ignore, sqlError);
-						}
-					}, sqlError);
-			});
-		}
-		
-		function setPastTracksToScrobbleable() {
-			db.transaction(function(tx) {
-				tx.executeSql('update TRACK_PLAY set lastfm_status = ? where lastfm_status = ? and id <> ?', [lastfmStatus.WAITING_FOR_SCROBBLING, lastfmStatus.PLAYING_SENT, currentTrack.id], ignore, sqlError);
-			});
-		}
-		
-		function saveLastfmUrl(trackId, url) {
-			db.transaction(function(tx) {
-				tx.executeSql('update TRACK_PLAY set lastfm_url = ? where id = ?', [url, trackId], ignore, sqlError);
-				sendUpdatedTrackInfo(trackId);
-			});
-		}
-		
 		function sendUpdatedTrackInfo(trackId) {
 			getTrackInfo(trackId, false, function(info) {
 				chrome.tabs.sendRequest(tabsForTracks[trackId], {type: "updatedtrackinfo", id: trackId, info: info}, function(response) {});
 			});
 		}
 		
-		function getTrackInfo(trackId, fetchMissingData, callback) {
-			db.transaction(function(tx) {
-				var info = {};
-				tx.executeSql('select lastfm_status, lastfm_url, lastfm_loved, title, artist, album, user_id, u.username from TRACK_PLAY p join USER u on u.id = p.user_id where p.id = ?', [trackId], function(tx, rs) {
-					if(rs.rows.length == 1) {
-						
-						var url = rs.rows.item(0)["lastfm_url"];
-						if ((!url || url == "") && fetchMissingData) {
-							lastfm.track.getInfo({artist: rs.rows.item(0)["artist"], track: rs.rows.item(0)["title"]}, {success: function(data){
-								saveLastfmUrl(trackId, data.track.url);
-							}, error: function(code, message){
-								if(rs.rows.item(0)["title"] != "") {
-									saveLastfmUrl(trackId, "http://www.last.fm/search?q=" + urlEncode(rs.rows.item(0)["title"] + " - " + rs.rows.item(0)["artist"]));
-								} else {
-									saveLastfmUrl(trackId, "none");
-								}
-							}});
-						} else {
-							info.lastfmurl = url;
-						}
-						info.lastfmstatus = rs.rows.item(0)["lastfm_status"];
-						info.lastfmloved = (rs.rows.item(0)["lastfm_loved"] == lastfmLovedStatus.LOVE_SENT || rs.rows.item(0)["lastfm_loved"] == lastfmLovedStatus.LOVE_ACKNOWLEDGED);
-						info.user = rs.rows.item(0)["username"];
-						info.userId = rs.rows.item(0)["user_id"];
-						
-						callback(info);
-					} else {
-						callback(undefined);
-					}
-				}, sqlError);
-			});
+		function sendUpdatedCallback(trackId) {
+			return function() {
+				sendUpdatedTrackInfo(trackId);
+			};
 		}
 		
-		function saveLovedStatus(trackId, status) {
-			db.transaction(function(tx) {
-				tx.executeSql('update TRACK_PLAY set lastfm_loved = ? where id = ?', [status, trackId], ignore, sqlError);
-				sendUpdatedTrackInfo(trackId);
+		function getTrackInfo(trackId, fetchMissingData, callback) {
+			db.getTrackInfo(trackId, sqlError, function(dbData) {
+				if(dbData) {
+					var info = {};
+					var url = dbData["lastfm_url"];
+					if ((!url || url == "") && fetchMissingData) {
+						lastfm.track.getInfo({artist: dbData["artist"], track: dbData["title"]}, {success: function(data){
+							db.saveLastfmUrl(trackId, data.track.url, sqlError, sendUpdatedCallback(trackId));
+						}, error: function(code, message){
+							var newUrl = "none";
+							if(dbData["title"] != "") {
+								newUrl = "http://www.last.fm/search?q=" + urlEncode(dbData["title"] + " - " + dbData["artist"]);
+							}
+							db.saveLastfmUrl(trackId, newUrl, sqlError, sendUpdatedCallback(trackId));
+						}});
+					} else {
+						info.lastfmurl = url;
+					}
+					info.lastfmstatus = dbData["lastfm_status"];
+					info.lastfmloved = (dbData["lastfm_loved"] == lastfmLovedStatus.LOVE_SENT || dbData["lastfm_loved"] == lastfmLovedStatus.LOVE_ACKNOWLEDGED);
+					info.user = dbData["username"];
+					info.userId = dbData["user_id"];
+					
+					callback(info);
+				} else {
+					callback(undefined);
+				}
 			});
 		}
 		
 		function setTrackLoved(trackId, title, artist) {
-			saveLovedStatus(trackId, lastfmLovedStatus.LOVE_SENT);
+			db.saveLovedStatus(trackId, lastfmLovedStatus.LOVE_SENT, sqlError, sendUpdatedCallback(trackId));
+			
 			if(settings.showlastfmlovebutton && lastfmSession && title && artist) {
-				lastfm.track.love({artist: artist, track: title}, lastfmSession, {success: function(data){
-					saveLovedStatus(trackId, lastfmLovedStatus.LOVE_ACKNOWLEDGED);
-				}, error: function(code, message){
-					console.log("Last.fm loving error.");
-				}});
+				lastfm.track.love({artist: artist, track: title}, lastfmSession, {
+					success: function(data){
+						db.saveLovedStatus(trackId, lastfmLovedStatus.LOVE_ACKNOWLEDGED, sqlError, sendUpdatedCallback(trackId));
+					}, error: function(code, message){
+						console.log("Last.fm loving error.");
+					}
+				});
 			}
 		}
 		
 		function setNowPlaying(track) {
 			if(settings.scrobble && lastfmSession && track.title && track.artist) {
 				lastfm.track.updateNowPlaying({track: track.title, artist: track.artist, album: track.album}, lastfmSession);
-				db.transaction(function(tx) {
-					tx.executeSql('update TRACK_PLAY set lastfm_status = ? where id = ?', [lastfmStatus.PLAYING_SENT, track.id], ignore, sqlError);
-				});
+				db.saveLastFmStatus(track.id, lastfmStatus.PLAYING_SENT, sqlError, ignore);
 			}
 		}
 		
@@ -220,12 +116,12 @@
 		function processMessage(request, sender, sendResponse) {
 			if(request.type == "addtracktodb") {
 				tabsForTracks[request.track.id] = sender.tab.id;
-				addTrackToDB(request.track, request.isCurrent);
+				db.addTrackToDB(request.track, request.isCurrent, settings.senddata, sqlError);
 				
 				if(request.isCurrent) {
 					currentTrack = request.track;
 					setNowPlaying(request.track);
-					setPastTracksToScrobbleable();
+					db.setPastTracksToScrobbleable(request.track.id, sqlError);
 				}
 				
 				sendResponse({"id": request.id});
@@ -299,25 +195,11 @@
 			settings.showlastfmlovebutton = (!showlastfmlovebutton || showlastfmlovebutton == "true");
 		}
 		
-		function setUserData(id, username) {
-			db.transaction(function(tx) {
-				tx.executeSql('select username from USER where id = ?', [id], function(tx, rs) {
-					if(rs.rows.length == 1) {
-						if(!rs.rows.item(0)["username"] || rs.rows.item(0)["username"] == "") {
-							tx.executeSql('update USER set username = ? where id = ?', [username, id], ignore, sqlError);
-						}
-					} else {
-						tx.executeSql('insert into USER(id, username) values (?, ?)', [id, username], ignore, sqlError);
-					}
-				}, sqlError);
-			});
-		}
-		
 		function initRoom(room) {
 			// Update the USER table with users from this room.
 			lrdata.getUsers(room, function(data) {
 				for(var i = 0; i < data.length; i++) {
-					setUserData(data[i].user_lr_id, data[i].username);
+					db.setUserData(data[i].user_lr_id, data[i].username, sqlError, ignore);
 				}
 			});
 		}
@@ -345,38 +227,27 @@
 		
 		function scrobbleOldestScrobbleableTrack() {
 			if(settings.scrobble && lastfmSession != undefined) {
-				db.transaction(function(tx) {
-					tx.executeSql('select id, artist, title, album, date from TRACK_PLAY where lastfm_status = ? order by date limit 1', [lastfmStatus.WAITING_FOR_SCROBBLING], function(tx2, rs) {
-						if(rs.rows.length == 1) {
-							var row = rs.rows.item(0);
-							var timestamp = Math.round(parseInt(row["date"]) / 1000);
-							lastfm.track.scrobble({track: row["title"], timestamp: timestamp, artist: row["artist"], album: row["album"]}, lastfmSession, {success: function(data){
-								db.transaction(function(tx3) {
-									tx3.executeSql('update TRACK_PLAY set lastfm_status = ? where id = ?', [lastfmStatus.SCROBBLED, row["id"]], ignore, sqlError);
-									sendUpdatedTrackInfo(row["id"]);
-								});
-							}, error: function(code, message){
-								console.log("Last.fm scrobble error: " + code + " - " + message);
-							}});
-						}
-					}, sqlError);
+				db.getOldestScrobbleableTrack(sqlError, function(dbData) {
+					if(dbData) {
+						var timestamp = Math.round(parseInt(dbData["date"]) / 1000);
+						lastfm.track.scrobble({track: dbData["title"], timestamp: timestamp, artist: dbData["artist"], album: dbData["album"]}, lastfmSession, {success: function(data){
+							db.saveLastFmStatus(dbData["id"], lastfmStatus.SCROBBLED, sqlError, sendUpdatedCallback(dbData["id"]));
+						}, error: function(code, message){
+							console.log("Last.fm scrobble error: " + code + " - " + message);
+						}});
+					}
 				});
 			}
 		}
 		
 		function sendOldestUnsentData() {
 			if(settings.senddata) {
-				db.transaction(function(tx) {
-					tx.executeSql('select p.id, artist, title, album, user_id, room, date, reported_by_user, reported_by_user_id, u.username from TRACK_PLAY p join USER u on u.id = p.user_id where send_data = 1 and artist <> "" and title <> "" and data_play_id is null order by date limit 1', [], function(tx2, rs) {
-						if(rs.rows.length == 1) {
-							var row = rs.rows.item(0);
-							lrdata.sendTrackData(row, function(data) {
-								db.transaction(function(tx2) {
-									tx2.executeSql('update TRACK_PLAY set data_track_id = ?, data_artist_id = ?, data_play_id = ? where id = ?', [data.trackId, data.artistId, data.playId, row["id"]], ignore, sqlError);
-								});
-							});
-						}
-					}, sqlError);
+				db.getOldestUnsentData(sqlError, function(dbData) {
+					if(dbData) {
+						lrdata.sendTrackData(dbData, function(data) {
+							db.saveLRDBData(dbData["id"], data, sqlError, ignore);
+						});
+					}
 				});
 			}
 		}
@@ -389,7 +260,6 @@
 		
 		function init() {
 			chrome.extension.onRequest.addListener(processMessage);
-			initDB();
 			var storedLastfmUser = window.localStorage.getItem("lastfm_username");
 			if(storedLastfmUser) {
 				lastfmUsername = storedLastfmUser;
