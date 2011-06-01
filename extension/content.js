@@ -123,7 +123,6 @@ function saveSettings() {
 	settings = {};
 	$('input[type="checkbox"][id^="addons_settings_"]').each(function() {
 		var key = this.id.replace("addons_settings_", "");
-		console.log(key);
 		settings[key] = this.checked;
 	});
 	
