@@ -1,0 +1,12 @@
+var lastfmStatus = {
+	SCROBBLING_DISABLED: -1,
+	UNSENT: 0,
+	PLAYING_SENT: 1,
+	WAITING_FOR_SCROBBLING: 2,
+	SCROBBLED: 3
+};
+
+var lastfmLovedStatus = {
+	LOVE_SENT: 1,
+	LOVE_ACKNOWLEDGED: 2
+};

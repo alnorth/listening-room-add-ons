@@ -3,27 +3,12 @@
 	<script type="text/javascript" src="lastfm.api.js"></script>
 	<script type="text/javascript" src="jquery.min.js"></script>
 	
+	<script type="text/javascript" src="constants.js"></script>
 	<script type="text/javascript" src="background-settings.js"></script>
 	<script type="text/javascript" src="background-db.js"></script>
 	<script type="text/javascript" src="background-lfm.js"></script>
 	<script type="text/javascript" src="lrdata-interface.js"></script>
 	<script>
-		////////////////////////////Enums
-		
-		var lastfmStatus = {
-			SCROBBLING_DISABLED: -1,
-			UNSENT: 0,
-			PLAYING_SENT: 1,
-			WAITING_FOR_SCROBBLING: 2,
-			SCROBBLED: 3
-		};
-		
-		var lastfmLovedStatus = {
-			LOVE_SENT: 1,
-			LOVE_ACKNOWLEDGED: 2
-		};
-		
-		////////////////////////////
 		
 		var db = new Database();
 		var currentTrack;
