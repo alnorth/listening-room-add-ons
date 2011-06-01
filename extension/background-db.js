@@ -73,7 +73,7 @@ function Database() {
 		};
 	};
 	
-	this.addTrackToDB = function(trackData, isCurrent, sendData, errCallback) {
+	this.addTrackToDB = function(trackData, isCurrent, scrobbling, sendData, errCallback) {
 		webDb.transaction(function(tx) {
 			tx.executeSql('select count(*) as num from TRACK_PLAY where id = ?', [trackData.id], function(tx2, rs) {
 					if(rs.rows.item(0)["num"] == 0) {
@@ -86,7 +86,7 @@ function Database() {
 								undefinedToBlank(trackData.title),
 								undefinedToBlank(trackData.album),
 								trackData.timestamp,
-								lastfmSession && isCurrent ? lastfmStatus.UNSENT : lastfmStatus.SCROBBLING_DISABLED,
+								scrobbling && isCurrent ? lastfmStatus.UNSENT : lastfmStatus.SCROBBLING_DISABLED,
 								'',
 								trackData.userId,
 								trackData.room,

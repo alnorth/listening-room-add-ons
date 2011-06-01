@@ -5,6 +5,7 @@
 	
 	<script type="text/javascript" src="background-settings.js"></script>
 	<script type="text/javascript" src="background-db.js"></script>
+	<script type="text/javascript" src="background-lfm.js"></script>
 	<script type="text/javascript" src="lrdata-interface.js"></script>
 	<script>
 		////////////////////////////Enums
@@ -26,15 +27,10 @@
 		
 		var db = new Database();
 		var currentTrack;
-		var lastfm = new LastFM({
-			apiKey    : 'c0db7c8bfb98655ab25aa2e959fdcc68',
-			apiSecret : 'aff4890d7cb9492bc72250abbeffc3e1'
-		});
 		var lrdata = new LRDataInterface("lrdata.alnorth.com", 8080);
 		var settings = new Settings(window.localStorage);
+		var lfm = new LastFmInterface();
 		var lastfmUsername;
-		var lastfmPassword;
-		var lastfmSession;
 		var tabsForTracks = {};
 		
 		function urlEncodeCharacter(c) {
@@ -63,15 +59,9 @@
 					var info = {};
 					var url = dbData["lastfm_url"];
 					if ((!url || url == "") && fetchMissingData) {
-						lastfm.track.getInfo({artist: dbData["artist"], track: dbData["title"]}, {success: function(data){
-							db.saveLastfmUrl(trackId, data.track.url, sqlError, sendUpdatedCallback(trackId));
-						}, error: function(code, message){
-							var newUrl = "none";
-							if(dbData["title"] != "") {
-								newUrl = "http://www.last.fm/search?q=" + urlEncode(dbData["title"] + " - " + dbData["artist"]);
-							}
-							db.saveLastfmUrl(trackId, newUrl, sqlError, sendUpdatedCallback(trackId));
-						}});
+						lfm.getTrackUrl(dbData["artist"], dbData["title"], function(trackUrl) {
+							db.saveLastfmUrl(trackId, trackUrl, sqlError, sendUpdatedCallback(trackId));
+						});
 					} else {
 						info.lastfmurl = url;
 					}
@@ -90,20 +80,16 @@
 		function setTrackLoved(trackId, title, artist) {
 			db.saveLovedStatus(trackId, lastfmLovedStatus.LOVE_SENT, sqlError, sendUpdatedCallback(trackId));
 			
-			if(settings.get("showlastfmlovebutton") && lastfmSession && title && artist) {
-				lastfm.track.love({artist: artist, track: title}, lastfmSession, {
-					success: function(data){
-						db.saveLovedStatus(trackId, lastfmLovedStatus.LOVE_ACKNOWLEDGED, sqlError, sendUpdatedCallback(trackId));
-					}, error: function(code, message){
-						console.log("Last.fm loving error.");
-					}
+			if(settings.get("showlastfmlovebutton") && lfm.signedIn() && title && artist) {
+				lfm.loveTrack(artist, title, lastfmError, function() {
+					db.saveLovedStatus(trackId, lastfmLovedStatus.LOVE_ACKNOWLEDGED, sqlError, sendUpdatedCallback(trackId));
 				});
 			}
 		}
 		
 		function setNowPlaying(track) {
-			if(settings.get("scrobble") && lastfmSession && track.title && track.artist) {
-				lastfm.track.updateNowPlaying({track: track.title, artist: track.artist, album: track.album}, lastfmSession);
+			if(settings.get("scrobble") && lfm.signedIn() && track.title && track.artist) {
+				lfm.setNowPlaying(track.artist, track.title, track.album, lastfmError);
 				db.saveLastFmStatus(track.id, lastfmStatus.PLAYING_SENT, sqlError, ignore);
 			}
 		}
@@ -114,10 +100,14 @@
 			console.log("SQL error: " + error.message);
 		}
 		
+		function lastfmError(code, message) {
+			console.log("Last.fm error: " + message);
+		}
+		
 		function processMessage(request, sender, sendResponse) {
 			if(request.type == "addtracktodb") {
 				tabsForTracks[request.track.id] = sender.tab.id;
-				db.addTrackToDB(request.track, request.isCurrent, settings.get("senddata"), sqlError);
+				db.addTrackToDB(request.track, request.isCurrent, lfm.signedIn(), settings.get("senddata"), sqlError);
 				
 				if(request.isCurrent) {
 					currentTrack = request.track;
@@ -153,8 +143,8 @@
 		function saveSettingsToLocalStorage(settingsData) {
 			settings.fromObject(settingsData);
 						
-			if(!settings.get("scrobble") && !settings.get("showlastfmlovebutton") && lastfmSession) {
-				lastfmSession = undefined;
+			if(!settings.get("scrobble") && !settings.get("showlastfmlovebutton") && lfm.signedIn()) {
+				lfm.clearSession();
 			}
 		}
 		
@@ -169,35 +159,29 @@
 		
 		function lastFmLoginData(login) {
 			lastfmUsername = login.username;
-						
-			lastfm.auth.getMobileSession({username: lastfmUsername, password: login.password}, {success: function(data){
-				lastfmSession = data.session;
+			
+			lfm.signIn(login.username, login.password, lastfmError, function() {
 				if(currentTrack) {
 					setNowPlaying(currentTrack);
 				}
-			}, error: function(code, message){
-				console.log("Last.fm log in error: " + code + " - " + message);
-			}});
+			});
 		}
 		
 		function showLastfmLoginBox() {
-			if((settings.get("scrobble") || settings.get("showlastfmlovebutton")) && lastfmSession == undefined) {
+			if((settings.get("scrobble") || settings.get("showlastfmlovebutton")) && !lfm.signedIn()) {
 				chrome.tabs.getSelected(null, function(tab) {
-				  chrome.tabs.sendRequest(tab.id, {type: "lastfmloginneeded", lastfmUsername: lastfmUsername}, function(response) {});
+					chrome.tabs.sendRequest(tab.id, {type: "lastfmloginneeded", lastfmUsername: lastfmUsername}, function(response) {});
 				});
 			}
 		}
 		
 		function scrobbleOldestScrobbleableTrack() {
-			if(settings.get("scrobble") && lastfmSession != undefined) {
+			if(settings.get("scrobble") && lfm.signedIn()) {
 				db.getOldestScrobbleableTrack(sqlError, function(dbData) {
 					if(dbData) {
-						var timestamp = Math.round(parseInt(dbData["date"]) / 1000);
-						lastfm.track.scrobble({track: dbData["title"], timestamp: timestamp, artist: dbData["artist"], album: dbData["album"]}, lastfmSession, {success: function(data){
+						lfm.scrobble(dbData["artist"], dbData["title"], dbData["album"], parseInt(dbData["date"]), lastfmError, function() {
 							db.saveLastFmStatus(dbData["id"], lastfmStatus.SCROBBLED, sqlError, sendUpdatedCallback(dbData["id"]));
-						}, error: function(code, message){
-							console.log("Last.fm scrobble error: " + code + " - " + message);
-						}});
+						});
 					}
 				});
 			}
