@@ -3,6 +3,7 @@
 	<script type="text/javascript" src="lastfm.api.js"></script>
 	<script type="text/javascript" src="jquery.min.js"></script>
 	
+	<script type="text/javascript" src="background-settings.js"></script>
 	<script type="text/javascript" src="background-db.js"></script>
 	<script type="text/javascript" src="lrdata-interface.js"></script>
 	<script>
@@ -30,7 +31,7 @@
 			apiSecret : 'aff4890d7cb9492bc72250abbeffc3e1'
 		});
 		var lrdata = new LRDataInterface("lrdata.alnorth.com", 8080);
-		var settings;
+		var settings = new Settings(window.localStorage);
 		var lastfmUsername;
 		var lastfmPassword;
 		var lastfmSession;
@@ -89,7 +90,7 @@
 		function setTrackLoved(trackId, title, artist) {
 			db.saveLovedStatus(trackId, lastfmLovedStatus.LOVE_SENT, sqlError, sendUpdatedCallback(trackId));
 			
-			if(settings.showlastfmlovebutton && lastfmSession && title && artist) {
+			if(settings.get("showlastfmlovebutton") && lastfmSession && title && artist) {
 				lastfm.track.love({artist: artist, track: title}, lastfmSession, {
 					success: function(data){
 						db.saveLovedStatus(trackId, lastfmLovedStatus.LOVE_ACKNOWLEDGED, sqlError, sendUpdatedCallback(trackId));
@@ -101,7 +102,7 @@
 		}
 		
 		function setNowPlaying(track) {
-			if(settings.scrobble && lastfmSession && track.title && track.artist) {
+			if(settings.get("scrobble") && lastfmSession && track.title && track.artist) {
 				lastfm.track.updateNowPlaying({track: track.title, artist: track.artist, album: track.album}, lastfmSession);
 				db.saveLastFmStatus(track.id, lastfmStatus.PLAYING_SENT, sqlError, ignore);
 			}
@@ -116,7 +117,7 @@
 		function processMessage(request, sender, sendResponse) {
 			if(request.type == "addtracktodb") {
 				tabsForTracks[request.track.id] = sender.tab.id;
-				db.addTrackToDB(request.track, request.isCurrent, settings.senddata, sqlError);
+				db.addTrackToDB(request.track, request.isCurrent, settings.get("senddata"), sqlError);
 				
 				if(request.isCurrent) {
 					currentTrack = request.track;
@@ -134,11 +135,10 @@
 					sendResponse(data);
 				});
 			} else if(request.type == "savesettings") {
-				settings = request.settings;
-				saveSettingsToLocalStorage();
+				saveSettingsToLocalStorage(request.settings);
 				sendResponse({});
 			} else if(request.type == "getsettings") {
-				sendResponse(settings);
+				sendResponse(settings.toObject());
 			} else if(request.type == "gettrackinfo") {
 				getTrackInfo(request.id, true, function(info) {sendResponse(info);});
 			} else if(request.type == "settrackloved") {
@@ -150,49 +150,12 @@
 			}
 		}
 		
-		function saveSettingsToLocalStorage() {
-			window.localStorage.setItem("hidechat", settings.hidechat ? "true" : "false");
-			window.localStorage.setItem("albumart", settings.albumart ? "true" : "false");
-			window.localStorage.setItem("twitterusernamelinks", settings.twitterusernamelinks ? "true" : "false");
-			window.localStorage.setItem("showchattimestamps", settings.showchattimestamps ? "true" : "false");
-			window.localStorage.setItem("disablerecordspinning", settings.disablerecordspinning ? "true" : "false");
-			
-			window.localStorage.setItem("senddata", settings.senddata ? "true" : "false");
-			
-			window.localStorage.setItem("scrobble", settings.scrobble ? "true" : "false");
-			window.localStorage.setItem("showscrobblestatus", settings.showscrobblestatus ? "true" : "false");
-			window.localStorage.setItem("lastfmlink", settings.lastfmlink ? "true" : "false");
-			window.localStorage.setItem("showlastfmlovebutton", settings.showlastfmlovebutton ? "true" : "false");
-			
-			if(!settings.scrobble && !settings.showlastfmlovebutton && lastfmSession) {
+		function saveSettingsToLocalStorage(settingsData) {
+			settings.fromObject(settingsData);
+						
+			if(!settings.get("scrobble") && !settings.get("showlastfmlovebutton") && lastfmSession) {
 				lastfmSession = undefined;
 			}
-		}
-		
-		function loadSettingsFromLocalStorage() {
-			settings = {};
-			var hidechat = window.localStorage.getItem("hidechat");
-			settings.hidechat = (hidechat && hidechat == "true");
-			var albumart = window.localStorage.getItem("albumart");
-			settings.albumart = (!albumart || albumart == "true");
-			var twitterusernamelinks = window.localStorage.getItem("twitterusernamelinks");
-			settings.twitterusernamelinks = (!twitterusernamelinks || twitterusernamelinks == "true");
-			var showchattimestamps = window.localStorage.getItem("showchattimestamps");
-			settings.showchattimestamps = (!showchattimestamps || showchattimestamps == "true");
-			var disablerecordspinning = window.localStorage.getItem("disablerecordspinning");
-			settings.disablerecordspinning = (disablerecordspinning && disablerecordspinning == "true");
-			
-			var senddata = window.localStorage.getItem("senddata");
-			settings.senddata = (!senddata || senddata == "true");
-			
-			var scrobble = window.localStorage.getItem("scrobble");
-			settings.scrobble = (!scrobble || scrobble == "true");
-			var lastfmlink = window.localStorage.getItem("lastfmlink");
-			settings.lastfmlink = (!lastfmlink || lastfmlink == "true");
-			var showscrobblestatus = window.localStorage.getItem("showscrobblestatus");
-			settings.showscrobblestatus = (!showscrobblestatus || showscrobblestatus == "true");
-			var showlastfmlovebutton = window.localStorage.getItem("showlastfmlovebutton");
-			settings.showlastfmlovebutton = (!showlastfmlovebutton || showlastfmlovebutton == "true");
 		}
 		
 		function initRoom(room) {
@@ -218,7 +181,7 @@
 		}
 		
 		function showLastfmLoginBox() {
-			if((settings.scrobble || settings.showlastfmlovebutton) && lastfmSession == undefined) {
+			if((settings.get("scrobble") || settings.get("showlastfmlovebutton")) && lastfmSession == undefined) {
 				chrome.tabs.getSelected(null, function(tab) {
 				  chrome.tabs.sendRequest(tab.id, {type: "lastfmloginneeded", lastfmUsername: lastfmUsername}, function(response) {});
 				});
@@ -226,7 +189,7 @@
 		}
 		
 		function scrobbleOldestScrobbleableTrack() {
-			if(settings.scrobble && lastfmSession != undefined) {
+			if(settings.get("scrobble") && lastfmSession != undefined) {
 				db.getOldestScrobbleableTrack(sqlError, function(dbData) {
 					if(dbData) {
 						var timestamp = Math.round(parseInt(dbData["date"]) / 1000);
@@ -241,7 +204,7 @@
 		}
 		
 		function sendOldestUnsentData() {
-			if(settings.senddata) {
+			if(settings.get("senddata")) {
 				db.getOldestUnsentData(sqlError, function(dbData) {
 					if(dbData) {
 						lrdata.sendTrackData(dbData, function(data) {
@@ -264,7 +227,6 @@
 			if(storedLastfmUser) {
 				lastfmUsername = storedLastfmUser;
 			}
-			loadSettingsFromLocalStorage();
 			setInterval(pulse, 5000);
 		}
 		
