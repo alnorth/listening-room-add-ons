@@ -121,20 +121,14 @@ function hideSettings() {
 
 function saveSettings() {
 	settings = {};
-	settings.hidechat = document.getElementById("addons_settings_hidechat").checked;
-	settings.albumart = document.getElementById("addons_settings_albumart").checked;
-	settings.twitterusernamelinks = document.getElementById("addons_settings_twitterusernamelinks").checked;
-	settings.showchattimestamps = document.getElementById("addons_settings_showchattimestamps").checked;
-	settings.disablerecordspinning = document.getElementById("addons_settings_disablerecordspinning").checked;
-	
-	settings.senddata = document.getElementById("addons_settings_senddata").checked;
-			
-	settings.scrobble = document.getElementById("addons_settings_scrobble").checked;
-	settings.showscrobblestatus = document.getElementById("addons_settings_showscrobblestatus").checked;
-	settings.lastfmlink = document.getElementById("addons_settings_lastfmlink").checked;
-	settings.showlastfmlovebutton = document.getElementById("addons_settings_showlastfmlovebutton").checked;
+	$('input[type="checkbox"][id^="addons_settings_"]').each(function() {
+		var key = this.id.replace("addons_settings_", "");
+		console.log(key);
+		settings[key] = this.checked;
+	});
 	
 	chrome.extension.sendRequest({type: "savesettings", settings:settings}, function(response) {});
+	
 	hideSettings();
 	updateAllTrackData();
 	applyChatHidden();
@@ -146,18 +140,11 @@ function saveSettings() {
 
 function loadSettings() {
 	chrome.extension.sendRequest({type: "getsettings"}, function(newSettings) {
-		document.getElementById("addons_settings_hidechat").checked = newSettings.hidechat;
-		document.getElementById("addons_settings_albumart").checked = newSettings.albumart;
-		document.getElementById("addons_settings_twitterusernamelinks").checked = newSettings.twitterusernamelinks;
-		document.getElementById("addons_settings_showchattimestamps").checked = newSettings.showchattimestamps;
-		document.getElementById("addons_settings_disablerecordspinning").checked = newSettings.disablerecordspinning;
-		
-		document.getElementById("addons_settings_senddata").checked = newSettings.senddata;
-		
-		document.getElementById("addons_settings_scrobble").checked = newSettings.scrobble;
-		document.getElementById("addons_settings_showscrobblestatus").checked = newSettings.showscrobblestatus;
-		document.getElementById("addons_settings_lastfmlink").checked = newSettings.lastfmlink;
-		document.getElementById("addons_settings_showlastfmlovebutton").checked = newSettings.showlastfmlovebutton;
+		for (key in newSettings) {
+			if (newSettings.hasOwnProperty(key)) {
+				document.getElementById("addons_settings_" + key).checked = newSettings[key];
+			}
+		}
 		
 		settings = newSettings;
 		applyChatHidden();
