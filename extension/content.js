@@ -466,7 +466,7 @@ function init() {
 	p.Controller.prototype.oldUpdateRecordRotation = p.Controller.prototype.updateRecordRotation;
 	p.Controller.prototype.updateRecordRotation = function() {
 		if(!settings.disablerecordspinning) {
-			this.oldUpdateRecordRotation();
+			this.oldUpdateRecordRotation.apply(this, arguments);
 		}
 	};
 	
