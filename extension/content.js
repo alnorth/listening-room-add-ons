@@ -315,7 +315,7 @@ function refreshRecordImages() {
 				if($(this).hasClass("mini-record")) {
 					trackId = p.room.normalizedUsersById[p.room.user.id].tracks[$(this).index()];
 				} else {
-					trackId = this.parentNode.id.replace("record-", "");
+					trackId = this.parentNode.parentNode.id.replace("record-", "");
 				}
 				var track = p.room.tracks[trackId];
 				if(track && track.metadata && track.metadata.title && track.metadata.artist && track.metadata.album) {
@@ -424,7 +424,7 @@ function init() {
 	p.Controller.prototype.oldUpdateRecordRotation = p.Controller.prototype.updateRecordRotation;
 	p.Controller.prototype.updateRecordRotation = function() {
 		if(!settings.disablerecordspinning) {
-			this.oldUpdateRecordRotation();
+			this.oldUpdateRecordRotation.apply(this, arguments);
 		}
 	};
 	
