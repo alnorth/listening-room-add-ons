@@ -42,6 +42,48 @@ div#addons_charts {
 	margin-left: -395px;
 }
 
+div#addons_charts_table table {
+	margin-left: auto;
+	margin-right: auto;
+	border-collapse:collapse;
+}
+
+div#addons_charts_table table td, div#addons_charts_table table th {
+	padding-left: 10px;
+	padding-right: 10px;
+	border: 1px solid #404040;
+}
+
+div#addons_charts_table table td {
+	font-size: smaller;
+}
+
+div#addons_charts_menu {
+	margin-bottom: 5px;
+}
+
+div#addons_charts_menu a {
+	display: inline-block;
+	width: 240px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	cursor: pointer;
+	text-align: center;
+}
+
+div#addons_charts_menu a {
+	display: inline-block;
+	width: 240px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	cursor: pointer;
+	text-align: center;
+}
+
+div#addons_charts_menu a:hover, div#addons_charts_menu a.selected {
+	background-color: #EEEEEE;
+}
+
 div#addons_settings_div, div#addons_changelog_div, div#addons_charts_div {
 	height: 300px;
 	overflow: auto;
@@ -108,10 +150,10 @@ div.annotation:hover div.addons_chat_timestamp {
 	display: block;
 }
 
-.addons_twitter_username a {
+.addons_twitter_username a, div#addons_charts_table a {
 	text-decoration: none !important;
 }
 
-.addons_twitter_username a:hover {
+.addons_twitter_username a:hover, div#addons_charts_table a:hover {
 	text-decoration: underline !important;
 }

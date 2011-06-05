@@ -34,15 +34,20 @@ function LRDataInterface(hostname, port) {
 	}
 	this.getTrackImageUrl = getTrackImageUrl;
 	
-	function getUsers(room, callback) {
-		var url = urlRoot +"/v1/all_users.json?callback=?";
+	function getData(page, params, callback) {
+		var url = urlRoot +"/v1/"+ page +".json?callback=?";
 		$.getJSON(
 			url,
-			{room: room},
+			params,
 			function(data, textStatus, jqXHR) {
 				callback(data);
 			}
 		);
+	}
+	this.getData = getData;
+	
+	function getUsers(room, callback) {
+		getData("all_users", {room: room}, callback);
 	}
 	this.getUsers = getUsers;
 	

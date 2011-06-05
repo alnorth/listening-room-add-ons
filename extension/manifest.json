@@ -7,7 +7,7 @@
 		{
 		"matches": ["http://listeningroom.net/room/*", "http://www.listeningroom.net/room/*", "http://listeningroom.fettig.net/room/*"],
 		"css": ["content.css"],
-		"js": ["constants.js", "lrdata-interface.js", "content.js"]
+		"js": ["constants.js", "lrdata-interface.js", "charts.js", "content.js"]
 		}
 	],
 	"permissions": [

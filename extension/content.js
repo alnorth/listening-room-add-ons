@@ -4,6 +4,7 @@ var p = pDiv.onclick();
 
 var $ = p.$;
 var lrdata = new LRDataInterface("lrdata.alnorth.com", 8080);
+var charts = new Charts(p.room.id, lrdata, "addons_charts_menu", "addons_charts_table");
 var settings;
 var storedTrackInfo = {};
 var recordsWithArtInCss = {};
@@ -178,6 +179,7 @@ function showCharts() {
 	showDimmer(hideCharts);
 	$("#addons_charts_div").height($(p).height() - 220);
 	$("#addons_charts").show();
+	charts.allUsers();
 }
 
 function hideCharts() {
