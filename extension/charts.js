@@ -1,7 +1,7 @@
 function Charts(room, lrdata, menuDivId, tableDivId) {
 
 	function allTracks() {
-		menu("tracks");
+		menu("tracks", "All Tracks");
 		lrdata.getData("all_tracks", {room: room}, function(data) {
 			renderTable(data, [
 				{name:"Title", column:"track_title", type:"t"},
@@ -19,7 +19,7 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 	this.track = track;
 	
 	function allArtists() {
-		menu("artists");
+		menu("artists", "All Artists");
 		lrdata.getData("all_artists", {room: room}, function(data) {
 			renderTable(data, [
 				{name:"Artist", column:"artist_name", type:"art"},
@@ -36,7 +36,7 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 	this.track = track;
 
 	function allUsers() {
-		menu("users");
+		menu("users", "All Users");
 		lrdata.getUsers(room, function(data) {
 			renderTable(data, [
 				{name:"Username", column:"username", type:"u"},
@@ -96,12 +96,16 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 		div.append(table);
 	}
 	
-	function menu(selected) {
+	function menu(selected, title, subSelected) {
 		var div = $("#" + menuDivId);
 		div.html('<div><a id="'+ menuDivId +'_tracks">Tracks</a><a id="'+ menuDivId +'_artists">Artists</a><a id="'+ menuDivId +'_users">Users</a></div>');
 		div.find("#"+ menuDivId +"_"+ selected).addClass("selected");
 		div.find("#"+ menuDivId +"_tracks").click(allTracks);
 		div.find("#"+ menuDivId +"_artists").click(allArtists);
 		div.find("#"+ menuDivId +"_users").click(allUsers);
+		
+		var title = $("<h2 />").text(title);
+		div.append(title);
 	}
+
 }
