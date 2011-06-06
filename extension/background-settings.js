@@ -9,6 +9,7 @@ function Settings(ls) {
 		"disablerecordspinning": false,
 		
 		"senddata": true,
+		"showchartlinks": true,
 		
 		"scrobble": true,
 		"lastfmlink": true,

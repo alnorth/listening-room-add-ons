@@ -179,7 +179,6 @@ function showCharts() {
 	showDimmer(hideCharts);
 	$("#addons_charts_div").height($(p).height() - 220);
 	$("#addons_charts").show();
-	charts.allTracks(0);
 }
 
 function hideCharts() {
@@ -216,8 +215,9 @@ function checkForNewTracks() {
 	});
 }
 
-function buttonHtml(url, imagename, titleText) {
-	return '<a href="'+ url +'" target="_blank"><img style="border: 0px;" src="'+ imagename +'" title="'+ titleText +'"/></a>';
+function buttonEl(url, imageUrl, titleText) {
+	return $("<a />").attr("href", url).attr("target", "_blank")
+			.append($("<img />").css("border", "0px").attr("src", imageUrl).attr("title", titleText));
 }
 
 function fetchTrackInfo(trackId) {
@@ -247,13 +247,13 @@ function updateSingleTrackData(trackId, el) {
 	var track = p.room.tracks[trackId];
 	
 	if(track && el.length === 1) {
-		var trackDataHtml = "";
+		var trackDataEl;
 		
 		var trackInfo = storedTrackInfo[trackId];
 		if(trackInfo) {
-			trackDataHtml += '<div class="addons_track_links">';
+			trackDataEl = $("<div />").addClass("addons_track_links");
 			if(settings.lastfmlink && trackInfo.lastfmurl && trackInfo.lastfmurl !== "none") {
-				trackDataHtml += buttonHtml(trackInfo.lastfmurl, chrome.extension.getURL("lastfm_button.png"), "See this track on Last.fm.");
+				trackDataEl.append(buttonEl(trackInfo.lastfmurl, chrome.extension.getURL("lastfm_button.png"), "See this track on Last.fm."));
 			}
 			if(settings.showscrobblestatus && trackInfo.lastfmstatus) {
 				var imagePath = "";
@@ -266,25 +266,52 @@ function updateSingleTrackData(trackId, el) {
 					titleText = "This track has been scrobbled.";
 				}
 				if(imagePath !== "") {
-					trackDataHtml += '<img style="border: 0px;" src="'+ chrome.extension.getURL(imagePath) +'" title="'+ titleText +'"/>';
+					trackDataEl.append($("<img />").css("border", "0px").attr("src", chrome.extension.getURL(imagePath)).attr("title", titleText));
 				}
 			}
 			if(settings.showlastfmlovebutton && !trackInfo.lastfmloved && track.metadata.title) {
-				trackDataHtml += '<a href="javascript:void(0);" class="addons_lastfm_lovebutton"><img style="border: 0px;" src="'+ chrome.extension.getURL("lovebutton.png") +'" title="Love this track on Last.fm" /></a>';
+				var loveLink = $("<a />").attr("href", "javascript:void(0);");
+				loveLink.append($("<img />").css("border", "0px").attr("src", chrome.extension.getURL("lovebutton.png")).attr("title", "Love this track on Last.fm"));
+				loveLink.click(function() {
+					setTrackLoved(trackId, track.metadata.title, track.metadata.artist);
+					$(this).hide();
+				});
+				trackDataEl.append(loveLink);
 			}
-			trackDataHtml += '</div>';
+			if(settings.showchartlinks) {
+				var userLink = $("<a />").attr("href", "javascript:void(0);").attr("title", "User chart data");
+				userLink.append($("<img />").css("border", "0px").attr("src", chrome.extension.getURL("user-link.png")));
+				userLink.click(function() {
+					charts.user_artists(trackInfo.user, 0);
+					showCharts();
+				});
+				trackDataEl.append(userLink);
+				
+				if(track.metadata.title && track.metadata.artist) {
+					var trackLink = $("<a />").attr("href", "javascript:void(0);").attr("title", "Track chart data");
+					trackLink.append($("<img />").css("border", "0px").attr("src", chrome.extension.getURL("track-link.png")));
+					trackLink.click(function() {
+						charts.track_users(track.metadata.title, track.metadata.artist, 0);
+						showCharts();
+					});
+					trackDataEl.append(trackLink);
+					
+					var artistLink = $("<a />").attr("href", "javascript:void(0);").attr("title", "Artist chart data");
+					artistLink.append($("<img />").css("border", "0px").attr("src", chrome.extension.getURL("artist-link.png")));
+					artistLink.click(function() {
+						charts.artist_tracks(track.metadata.artist, 0);
+						showCharts();
+					});
+					trackDataEl.append(artistLink);
+				}
+			}
 			
 		} else {
 			fetchTrackInfo(trackId);
 		}
 		
-		el.html(trackDataHtml);
-		if(settings.showlastfmlovebutton) {
-			el.find("a.addons_lastfm_lovebutton").click(function() {
-				setTrackLoved(trackId, track.metadata.title, track.metadata.artist);
-				$(this).hide();
-			});
-		}
+		el.empty();
+		el.append(trackDataEl);
 	}
 }
 
@@ -434,6 +461,8 @@ function init() {
 	setTimeout(loadSpinsData, 10000);
 	chrome.extension.onRequest.addListener(processMessage);
 	chrome.extension.sendRequest({type: "initroom", room: p.room.id}, function(response) {});
+	
+	charts.allTracks(0);
 }
 
 init();
