@@ -179,7 +179,7 @@ function showCharts() {
 	showDimmer(hideCharts);
 	$("#addons_charts_div").height($(p).height() - 220);
 	$("#addons_charts").show();
-	charts.allUsers();
+	charts.allTracks(0);
 }
 
 function hideCharts() {

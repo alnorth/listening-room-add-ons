@@ -161,4 +161,5 @@ div.annotation:hover div.addons_chat_timestamp {
 
 .addons_twitter_username a:hover, div#addons_charts_table a:hover {
 	text-decoration: underline !important;
+	cursor: pointer;
 }
