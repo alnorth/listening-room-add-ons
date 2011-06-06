@@ -157,3 +157,7 @@ div.annotation:hover div.addons_chat_timestamp {
 	text-decoration: underline !important;
 	cursor: pointer;
 }
+
+td.nobreak {
+	white-space: nowrap;
+}

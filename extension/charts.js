@@ -1,7 +1,22 @@
 function Charts(room, lrdata, menuDivId, tableDivId) {
 
 	// TODO: "More" link below table.
-
+	
+	// From http://code.google.com/p/flexible-js-formatting/
+	String.leftPad = function (val, size, ch) {
+		var result = new String(val);
+		if (ch == null) {
+			ch = " ";
+		}
+		while (result.length < size) {
+			result = ch + result;
+		}
+		return result;
+	};
+	
+	// From http://www.xaprb.com/articles/date-formatting-demo.html
+	Date.prototype.chartsFormatted = function (){return this.getFullYear() + '-' + String.leftPad(this.getMonth() + 1, 2, '0') + '-' + String.leftPad(this.getDate(), 2, '0') + ' ' + String.leftPad(this.getHours(), 2, '0') + ':' + String.leftPad(this.getMinutes(), 2, '0') + ':' + String.leftPad(this.getSeconds(), 2, '0');};
+		
 	var colProfiles = {
 		users: [
 			{name:"Username", column:"username", type:"u"},
@@ -154,7 +169,8 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 				var cell = $("<td />");
 				if(columns[j].type && columns[j].type === "d") {
 					var dt = new Date(dataRow[columns[j].column] * 1000);
-					cell.text(dt.toLocaleString());
+					cell.text(dt.chartsFormatted());
+					cell.addClass("nobreak");
 				} else if(columns[j].type) {
 					var link = $("<a />");
 					link.text(dataRow[columns[j].column]);
