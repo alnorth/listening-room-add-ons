@@ -43,13 +43,13 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 	this.allTracks = allTracks;
 	
 	function track_users(trackTitle, artistName, page) {
-		menu("tracks", artistName +" - "+ trackTitle, "users", [trackTitle, artistName, 0]);
+		menu("tracks", trackTitleEl(trackTitle, artistName), "users", [trackTitle, artistName, 0]);
 		loadAndRender("track", {type: "users", artist_name: artistName, track_title: trackTitle}, page, colProfiles.users, {});
 	}
 	this.track_users = track_users;
 	
 	function track_plays(trackTitle, artistName, page) {
-		menu("tracks", artistName +" - "+ trackTitle, "plays", [trackTitle, artistName, 0]);
+		menu("tracks", trackTitleEl(trackTitle, artistName), "plays", [trackTitle, artistName, 0]);
 		loadAndRender("track", {type: "all_plays", artist_name: artistName, track_title: trackTitle}, page, colProfiles.user_play, {});
 	}
 	this.track_plays = track_plays;
@@ -170,6 +170,13 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 		div.append(table);
 	}
 	
+	function trackTitleEl(trackTitle, artistName) {
+		var artistLink = $("<a />").text(artistName).click(function() {
+			artist_tracks(artistName, 0);
+		});
+		return $("<span />").append(artistLink).append($("<span />").text(" - "+ trackTitle));
+	}
+	
 	var firstLevelMenu = [
 		{title: "Tracks", id: "tracks", func: allTracks},
 		{title: "Artists", id: "artists", func: allArtists},
@@ -222,8 +229,11 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 		
 		div.append(buildMenu(firstLevelMenu, selected, getFirstLevelFunction, args));
 		
-		var h3 = $("<h3 />").text(title);
-		div.append(h3);
+		if(typeof(title) === "string") {
+			div.append($("<h3 />").text(title));
+		} else {
+			div.append($("<h3 />").append(title));
+		}
 		
 		if(subSelected) {
 			var menuDesc = secondLevelMenus[selected];

@@ -63,20 +63,14 @@ div#addons_charts_menu {
 }
 
 div#addons_charts_menu a {
-	display: inline-block;
-	width: 240px;
-	padding-top: 5px;
-	padding-bottom: 5px;
 	cursor: pointer;
-	text-align: center;
 }
 
-div#addons_charts_menu a {
+div#addons_charts_menu div a {
 	display: inline-block;
 	width: 240px;
 	padding-top: 5px;
 	padding-bottom: 5px;
-	cursor: pointer;
 	text-align: center;
 }
 
