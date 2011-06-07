@@ -1,6 +1,4 @@
 function Charts(room, lrdata, menuDivId, tableDivId) {
-
-	// TODO: "More" link below table.
 	
 	// From http://code.google.com/p/flexible-js-formatting/
 	String.leftPad = function (val, size, ch) {
@@ -53,71 +51,93 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 	
 	function allTracks(page) {
 		menu("tracks", "All Tracks");
-		loadAndRender("all_tracks", {}, page, colProfiles.track_artist, {});
+		loadAndRender("all_tracks", {}, page, colProfiles.track_artist, {}, function() {
+			allTracks(page + 1);
+		});
 	}
 	this.allTracks = allTracks;
 	
 	function track_users(trackTitle, artistName, page) {
 		menu("tracks", trackTitleEl(trackTitle, artistName), "users", [trackTitle, artistName, 0]);
-		loadAndRender("track", {type: "users", artist_name: artistName, track_title: trackTitle}, page, colProfiles.users, {});
+		loadAndRender("track", {type: "users", artist_name: artistName, track_title: trackTitle}, page, colProfiles.users, {}, function() {
+			track_users(trackTitle, artistName, page + 1);
+		});
 	}
 	this.track_users = track_users;
 	
 	function track_plays(trackTitle, artistName, page) {
 		menu("tracks", trackTitleEl(trackTitle, artistName), "plays", [trackTitle, artistName, 0]);
-		loadAndRender("track", {type: "all_plays", artist_name: artistName, track_title: trackTitle}, page, colProfiles.user_play, {});
+		loadAndRender("track", {type: "all_plays", artist_name: artistName, track_title: trackTitle}, page, colProfiles.user_play, {}, function() {
+			track_plays(trackTitle, artistName, page + 1);
+		});
 	}
 	this.track_plays = track_plays;
 	
 	function allArtists(page) {
 		menu("artists", "All Artists");
-		loadAndRender("all_artists", {}, page, colProfiles.artists, {});
+		loadAndRender("all_artists", {}, page, colProfiles.artists, {}, function() {
+			allArtists(page + 1);
+		});
 	}
 	this.allArtists = allArtists;
 	
 	function artist_tracks(artistName, page) {
 		menu("artists", artistName, "tracks", [artistName, 0]);
-		loadAndRender("artist", {type: "tracks", artist_name: artistName}, page, colProfiles.tracks, {artist_name: artistName});
+		loadAndRender("artist", {type: "tracks", artist_name: artistName}, page, colProfiles.tracks, {artist_name: artistName}, function() {
+			artist_tracks(artistName, page + 1);
+		});
 	}
 	this.artist_tracks = artist_tracks;
 	
 	function artist_users(artistName, page) {
 		menu("artists", artistName, "users", [artistName, 0]);
-		loadAndRender("artist", {type: "users", artist_name: artistName}, page, colProfiles.users, {artist_name: artistName});
+		loadAndRender("artist", {type: "users", artist_name: artistName}, page, colProfiles.users, {artist_name: artistName}, function() {
+			artist_users(artistName, page + 1);
+		});
 	}
 	this.artist_users = artist_users;
 	
 	function artist_plays(artistName, page) {
 		menu("artists", artistName, "plays", [artistName, 0]);
-		loadAndRender("artist", {type: "all_plays", artist_name: artistName}, page, colProfiles.user_track_play, {artist_name: artistName});
+		loadAndRender("artist", {type: "all_plays", artist_name: artistName}, page, colProfiles.user_track_play, {artist_name: artistName}, function() {
+			artist_plays(artistName, page + 1);
+		});
 	}
 	this.artist_plays = artist_plays;
 
 	function allUsers(page) {
 		menu("users", "All Users");
-		loadAndRender("all_users", {}, page, colProfiles.users, {});
+		loadAndRender("all_users", {}, page, colProfiles.users, {}, function() {
+			allUsers(page + 1);
+		});
 	}
 	this.allUsers = allUsers;
 	
 	function user_artists(username, page) {
 		menu("users", username, "artists", [username, 0]);
-		loadAndRender("user", {type: "artists", username: username}, page, colProfiles.artists, {});
+		loadAndRender("user", {type: "artists", username: username}, page, colProfiles.artists, {}, function() {
+			user_artists(username, page + 1);
+		});
 	}
 	this.user_artists = user_artists;
 	
 	function user_tracks(username, page) {
 		menu("users", username, "tracks", [username, 0]);
-		loadAndRender("user", {type: "tracks", username: username}, page, colProfiles.track_artist, {});
+		loadAndRender("user", {type: "tracks", username: username}, page, colProfiles.track_artist, {}, function() {
+			user_tracks(username, page + 1);
+		});
 	}
 	this.user_tracks = user_tracks;
 	
 	function user_plays(username, page) {
 		menu("users", username, "plays", [username, 0]);
-		loadAndRender("user", {type: "all_plays", username: username}, page, colProfiles.track_artist_play, {});
+		loadAndRender("user", {type: "all_plays", username: username}, page, colProfiles.track_artist_play, {}, function() {
+			user_plays(username, page + 1);
+		});
 	}
 	this.user_plays = user_plays;
 	
-	function loadAndRender(pageName, extraParams, pageNo, columnProfile, altValues) {
+	function loadAndRender(pageName, extraParams, pageNo, columnProfile, altValues, nextPageFn) {
 		var params = {room: room, limit: 200, offset: pageNo * 200};
 		var key;
 		for (key in extraParams) {
@@ -126,7 +146,7 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 			}
 		}
 		lrdata.getData(pageName, params, function(data) {
-			renderTable(data, columnProfile, altValues);
+			renderTable(data, columnProfile, altValues, nextPageFn);
 		});
 	}
 	
@@ -149,7 +169,7 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 		}
 	}
 	
-	function renderTable(data, columns, altValues) {
+	function renderTable(data, columns, altValues, nextPageFn) {
 		var div = $("#" + tableDivId);
 		div.empty();
 		
@@ -184,6 +204,7 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 			table.append(row);
 		}
 		div.append(table);
+		div.append($("<div />").addClass("more_link").append($("<a />").text("More >>").click(nextPageFn)));
 	}
 	
 	function trackTitleEl(trackTitle, artistName) {

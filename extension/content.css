@@ -165,3 +165,7 @@ div.annotation:hover div.addons_chat_timestamp {
 td.nobreak {
 	white-space: nowrap;
 }
+
+div.more_link {
+	text-align: right;
+}
