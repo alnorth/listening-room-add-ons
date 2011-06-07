@@ -457,6 +457,8 @@ function init() {
 	
 		$("#addons_lastfm_button").click(sendLastFmLogin);
 		$("#addons_lastfm_cancel").click(dontDoLastFmLogin);
+		
+		charts.allTracks(0);
 	});
 	
 	$("#sponsor").after("<div id=\"addons_links\"></div>");
@@ -471,8 +473,6 @@ function init() {
 	setTimeout(loadSpinsData, 10000);
 	chrome.extension.onRequest.addListener(processMessage);
 	chrome.extension.sendRequest({type: "initroom", room: p.room.id}, function(response) {});
-	
-	charts.allTracks(0);
 }
 
 init();
