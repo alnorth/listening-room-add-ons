@@ -6,7 +6,7 @@ function Settings(ls) {
 		"albumart": true,
 		"twitterusernamelinks": true,
 		"showchattimestamps": true,
-		"disablerecordspinning": false,
+		"recordrefreshrate": 40,
 		
 		"senddata": true,
 		"showchartlinks": true,
@@ -18,14 +18,22 @@ function Settings(ls) {
 	};
 
 	var set = function(key, value) {
-		ls.setItem(key, value ? "true" : "false");
+		if(typeof(defaults[key]) === "number") {
+			ls.setItem(key, parseInt(value, 10));
+		} else {
+			ls.setItem(key, value ? "true" : "false");
+		}
 	};
 	this.set = set;
 	
 	var get = function(key) {
 		var value = ls.getItem(key);
 		if(value) {
-			return (value === "true");
+			if(typeof(defaults[key]) === "number") {
+				return value;
+			} else {
+				return (value === "true");
+			}
 		} else {
 			return defaults[key];
 		}

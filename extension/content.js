@@ -107,6 +107,10 @@ function saveSettings() {
 		var key = this.id.replace("addons_settings_", "");
 		settings[key] = this.checked;
 	});
+	$('input[type="number"][id^="addons_settings_"]').each(function() {
+		var key = this.id.replace("addons_settings_", "");
+		settings[key] = this.value;
+	});
 	
 	chrome.extension.sendRequest({type: "savesettings", settings:settings}, function(response) {});
 	
@@ -117,6 +121,7 @@ function saveSettings() {
 	refreshRecordImages();
 	removeTwitterLinksIfNecessary();
 	removeChatTimestampsIfNecessary();
+	setRecordRefreshRate();
 }
 
 function loadSettings() {
@@ -124,12 +129,20 @@ function loadSettings() {
 		var key;
 		for (key in newSettings) {
 			if (newSettings.hasOwnProperty(key)) {
-				document.getElementById("addons_settings_" + key).checked = newSettings[key];
+				var el = document.getElementById("addons_settings_" + key);
+				if(el) {
+					if(el.type === "number") {
+						el.value = newSettings[key];
+					} else {
+						el.checked = newSettings[key];
+					}
+				}
 			}
 		}
 		
 		settings = newSettings;
 		applyChatHidden();
+		setRecordRefreshRate();
 	});
 }
 
@@ -419,6 +432,10 @@ function removeChatTimestampsIfNecessary() {
 	}
 }
 
+function setRecordRefreshRate() {
+	p.lr.FPS = settings.recordrefreshrate;
+}
+
 function pulse() {
 	checkForNewTracks();
 	linkifyTwitterNames();
@@ -449,13 +466,6 @@ function init() {
 		$("#addons_settings_link").click(showSettings);
 		$("#addons_changelog_link").click(showChangelog);
 	});
-	
-	p.Controller.prototype.oldUpdateRecordRotation = p.Controller.prototype.updateRecordRotation;
-	p.Controller.prototype.updateRecordRotation = function() {
-		if(!settings.disablerecordspinning) {
-			this.oldUpdateRecordRotation.apply(this, arguments);
-		}
-	};
 	
 	setInterval(pulse, 1000);
 	setTimeout(loadSpinsData, 10000);
