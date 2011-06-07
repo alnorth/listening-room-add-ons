@@ -204,7 +204,9 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 			table.append(row);
 		}
 		div.append(table);
-		div.append($("<div />").addClass("more_link").append($("<a />").text("More >>").click(nextPageFn)));
+		if(data.length === 200) {
+			div.append($("<div />").addClass("more_link").append($("<a />").text("More >>").click(nextPageFn)));
+		}
 	}
 	
 	function trackTitleEl(trackTitle, artistName) {
