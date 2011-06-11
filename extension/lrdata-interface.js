@@ -1,6 +1,9 @@
 function LRDataInterface(hostname, port) {
 
-	var urlRoot = "http://"+ hostname +":"+ port;
+	var urlRoot = "http://"+ hostname
+	if(port) {
+		urlRoot += ":"+ port;
+	}
 	
 	function sendTrackData(track, callback) {
 		if(track.title && track.title !== "" && track.artist && track.artist !== "") {
