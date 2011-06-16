@@ -8,6 +8,7 @@ function Settings(ls) {
 		"showchattimestamps": true,
 		"showchatnotifications": true,
 		"showsongnotifications": true,
+		"notificationtimeout": 10,
 		"recordrefreshrate": 40,
 		
 		"senddata": true,

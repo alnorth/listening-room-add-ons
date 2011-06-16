@@ -265,7 +265,7 @@ function checkForNewTracks() {
 						title: user.name + " is playing:",
 						image: art,
 						body: trackText,
-						timeout: 10000
+						timeout: settings.notificationtimeout * 1000
 					})
 				}
 			}
@@ -482,7 +482,7 @@ function checkForNewChatMessages() {
 		        title: userName,
 		        image: avatar,
 		        body: message,
-		        timeout: 10000
+		        timeout: settings.notificationtimeout * 1000
 		    });
 		}
 	}

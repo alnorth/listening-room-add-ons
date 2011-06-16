@@ -112,7 +112,7 @@ a#addons_settings_cancel, a#addons_lastfm_cancel {
 	margin-left: 40px;
 }
 
-input#addons_settings_recordrefreshrate {
+input#addons_settings_recordrefreshrate, input#addons_settings_notificationtimeout {
 	width: 35px;
 }
 
