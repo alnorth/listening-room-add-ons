@@ -2,13 +2,15 @@ var pDiv = document.createElement("div");
 pDiv.setAttribute("onclick", "return window;");
 var p = pDiv.onclick();
 
-var $ = p.$;
-var lrdata = new LRDataInterface("lrdata.alnorth.com");
-var charts = new Charts(p.room.id, lrdata, "addons_charts_menu", "addons_charts_table");
-var settings;
-var storedTrackInfo = {};
-var recordsWithArtInCss = {};
-var initialChatMessagesProcessed = false;
+var $ = p.$,
+	lrdata = new LRDataInterface("lrdata.alnorth.com"),
+	charts = new Charts(p.room.id, lrdata, "addons_charts_menu", "addons_charts_table"),
+	settings,
+	storedTrackInfo = {},
+	recordsWithArtInCss = {},
+	initialChatMessagesProcessed = false,
+	lastChatMessage = "",
+	lastSong = "";
 
 function getTrackStartTimestamp(trackId) {
 	var timestamp = null;
@@ -424,6 +426,74 @@ function checkForNewChatMessages() {
 			$(this).prepend("<div class=\"addons_chat_timestamp\">"+ this.dataset.time +"</div>");
 		});
 	}
+	
+	if(settings.showchatnotifications) {
+		var $chatBlock = $(".annotations").first().find(".annotation").first(),
+			userName = $chatBlock.find(".username").data("username"),
+			avatar = $chatBlock.find(".avatar").attr("src"),
+			message = $chatBlock.find(".message").last().html(),
+			newChatMessage = userName + message;
+		if(message && lastChatMessage !== newChatMessage && newChatMessage !== "") {
+			lastChatMessage = userName + message;
+			desktopAlert({
+		        title: userName,
+		        image: avatar,
+		        body: message,
+		        timeout: 10000
+		    });
+		}
+	}
+	
+	if(settings.showsongnotifications) {
+		var $songBlock = $(".trackHistory-current").first().find(".description").first(),
+			title = $songBlock.find(".title").html(),
+			artist = $songBlock.find(".artist").html(),
+			album = $songBlock.find(".album").html(),
+			user = $songBlock.find(".addons_twitter_username").data("username"),
+			artStyle = $(".recordWrapper .record").css("background-image") + "",
+			art = "",
+			newSong = "";
+		if(artStyle) {
+			art = artStyle.slice(4, artStyle.length - 1);
+		}
+		if(title) {
+			newSong += title;
+			if(artist) {
+				newSong += " by ";
+				newSong += artist;
+			}
+			/*
+			if(album) {
+				newSong += " from ";
+				newSong += album;
+			}
+			*/
+			if(newSong !== lastSong) {
+				lastSong = newSong;
+				desktopAlert({
+					title: user + " is playing:",
+					image: art,
+					body: newSong,
+					timeout: 10000
+				})
+			}
+		}
+	}
+	
+}
+
+function desktopAlert(notificationObj) {
+	// console.log("desktopAlert: ", notificationObj);
+    var notification = webkitNotifications.createNotification(
+      notificationObj.image?notificationObj.image:"",  // icon url - can be relative
+      notificationObj.title?notificationObj.title:"",  // notification title
+      notificationObj.body?notificationObj.body:""  // notification body text
+    );
+    notification.show();
+    setTimeout(function(){
+        notification.cancel();
+    }, notificationObj.timeout);
+    
 }
 
 function removeChatTimestampsIfNecessary() {
@@ -473,6 +543,20 @@ function init() {
 	setTimeout(loadSpinsData, 10000);
 	chrome.extension.onRequest.addListener(processMessage);
 	chrome.extension.sendRequest({type: "initroom", room: p.room.id}, function(response) {});
+	
+	if(window.webkitNotifications && window.webkitNotifications.checkPermission() != 0){
+        $("body").bind('click.enableDesktopNotify', function() {
+			window.webkitNotifications.requestPermission(function() {
+				desktopAlert({
+	                title: "",
+	                image: "",
+	                body: "Desktop notifications enabled.",
+	                timeout: 1
+	            });
+            	$("body").unbind('click.enableDesktopNotify');
+			});
+        });
+    }
 }
 
 init();

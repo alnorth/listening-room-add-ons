@@ -6,6 +6,8 @@ function Settings(ls) {
 		"albumart": true,
 		"twitterusernamelinks": true,
 		"showchattimestamps": true,
+		"showchatnotifications": true,
+		"showsongnotifications": true,
 		"recordrefreshrate": 40,
 		
 		"senddata": true,
