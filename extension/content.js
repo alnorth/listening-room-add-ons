@@ -10,7 +10,7 @@ var $ = p.$,
 	recordsWithArtInCss = {},
 	initialChatMessagesProcessed = false,
 	lastChatMessage = "",
-	lastSong = "";
+	lastSongNotifiedId = "";
 
 function getTrackStartTimestamp(trackId) {
 	var timestamp = null;
@@ -228,6 +228,49 @@ function checkForNewTracks() {
 		
 		addTrackToDBByID(trackId);
 	});
+	
+	// But there's no need to wait to show the notifications
+	if(settings.showsongnotifications) {
+		var $songBlock = $(".trackHistory-current .recordWithDescription");
+		if($songBlock.length === 1) {
+			var	trackId = $songBlock.attr('id').replace("record-", ""),
+				track = p.room.tracks[trackId],
+				user = p.room.normalizedUsersById[track.userId],
+				artStyle = $songBlock.find(".recordWrapper .record").css("background-image") + "",
+				art = "",
+				trackText = "";
+			
+			if(trackId !== lastSongNotifiedId) {
+				lastSongNotifiedId = trackId;
+				
+				if(user && track.metadata && track.metadata.title) {
+					if(artStyle !== "none") {
+						art = artStyle.slice(4, artStyle.length - 1);
+					} else {
+						art = lrdata.getTrackImageUrl(track.metadata.title, track.metadata.artist, track.metadata.album);
+					}
+					
+					trackText += track.metadata.title;
+					if(track.metadata.artist) {
+						trackText += " by ";
+						trackText += track.metadata.artist;
+					}
+					/*
+					if(track.metadata.album) {
+						trackText += " from ";
+						trackText += track.metadata.album;
+					}
+					*/
+					desktopAlert({
+						title: user.name + " is playing:",
+						image: art,
+						body: trackText,
+						timeout: 10000
+					})
+				}
+			}
+		}
+	}
 }
 
 function buttonEl(url, imageUrl, titleText) {
@@ -443,47 +486,9 @@ function checkForNewChatMessages() {
 		    });
 		}
 	}
-	
-	if(settings.showsongnotifications) {
-		var $songBlock = $(".trackHistory-current").first().find(".description").first(),
-			title = $songBlock.find(".title").html(),
-			artist = $songBlock.find(".artist").html(),
-			album = $songBlock.find(".album").html(),
-			user = $songBlock.find(".addons_twitter_username").data("username"),
-			artStyle = $(".recordWrapper .record").css("background-image") + "",
-			art = "",
-			newSong = "";
-		if(artStyle) {
-			art = artStyle.slice(4, artStyle.length - 1);
-		}
-		if(title) {
-			newSong += title;
-			if(artist) {
-				newSong += " by ";
-				newSong += artist;
-			}
-			/*
-			if(album) {
-				newSong += " from ";
-				newSong += album;
-			}
-			*/
-			if(newSong !== lastSong) {
-				lastSong = newSong;
-				desktopAlert({
-					title: user + " is playing:",
-					image: art,
-					body: newSong,
-					timeout: 10000
-				})
-			}
-		}
-	}
-	
 }
 
 function desktopAlert(notificationObj) {
-	// console.log("desktopAlert: ", notificationObj);
     var notification = webkitNotifications.createNotification(
       notificationObj.image?notificationObj.image:"",  // icon url - can be relative
       notificationObj.title?notificationObj.title:"",  // notification title
