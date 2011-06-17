@@ -51,7 +51,7 @@ function addTrackToDBByID(id) {
 }
 
 function addTrackToDB(track, displayed) {
-	var user = p.room.normalizedUsersById[track.userId];
+	var user = p.room.users[track.userId];
 	var trackData = {
 		id: track.id,
 		userId: track.userId,
@@ -235,7 +235,7 @@ function checkForNewTracks() {
 		if($songBlock.length === 1) {
 			var	trackId = $songBlock.attr('id').replace("record-", ""),
 				track = p.room.tracks[trackId],
-				user = p.room.normalizedUsersById[track.userId],
+				user = p.room.users[track.userId],
 				artStyle = $songBlock.find(".recordWrapper .record").css("background-image") + "",
 				art = "",
 				trackText = "";
@@ -400,7 +400,7 @@ function refreshRecordImages() {
 			if($(this).css("background-image") === "none") {
 				var trackId = "";
 				if($(this).hasClass("mini-record")) {
-					trackId = p.room.normalizedUsersById[p.room.user.id].tracks[$(this).index()];
+					trackId = p.room.users[p.room.user.id].tracks[$(this).index()];
 				} else {
 					trackId = this.parentNode.parentNode.id.replace("record-", "");
 				}
