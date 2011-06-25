@@ -10,7 +10,8 @@ var $ = p.$,
 	recordsWithArtInCss = {},
 	initialChatMessagesProcessed = false,
 	lastChatMessage = "",
-	lastSongNotifiedId = "";
+	lastSongNotifiedId = "",
+	focused = true;
 
 function getTrackStartTimestamp(trackId) {
 	var timestamp = null;
@@ -489,16 +490,17 @@ function checkForNewChatMessages() {
 }
 
 function desktopAlert(notificationObj) {
-    var notification = webkitNotifications.createNotification(
-      notificationObj.image?notificationObj.image:"",  // icon url - can be relative
-      notificationObj.title?notificationObj.title:"",  // notification title
-      notificationObj.body?notificationObj.body:""  // notification body text
-    );
-    notification.show();
-    setTimeout(function(){
-        notification.cancel();
-    }, notificationObj.timeout);
-    
+	if(!focused) {
+		var notification = webkitNotifications.createNotification(
+			notificationObj.image?notificationObj.image:"",  // icon url - can be relative
+			notificationObj.title?notificationObj.title:"",  // notification title
+			notificationObj.body?notificationObj.body:""  // notification body text
+		);
+		notification.show();
+		setTimeout(function(){
+			notification.cancel();
+		}, notificationObj.timeout);
+	}
 }
 
 function removeChatTimestampsIfNecessary() {
@@ -548,6 +550,14 @@ function init() {
 	setTimeout(loadSpinsData, 10000);
 	chrome.extension.onRequest.addListener(processMessage);
 	chrome.extension.sendRequest({type: "initroom", room: p.room.id}, function(response) {});
+	
+	window.addEventListener('focus', function() {
+		focused = true;
+	});
+
+	window.addEventListener('blur', function() {
+		focused = false;
+	});
 	
 	if(window.webkitNotifications && window.webkitNotifications.checkPermission() != 0){
         $("body").bind('click.enableDesktopNotify', function() {
