@@ -476,7 +476,7 @@ function checkForNewChatMessages() {
 			avatar = $chatBlock.find(".avatar").attr("src"),
 			message = $chatBlock.find(".message").last().html(),
 			newChatMessage = userName + message;
-		if(message && lastChatMessage !== newChatMessage && newChatMessage !== "") {
+		if(message && lastChatMessage !== newChatMessage && newChatMessage !== "" && userName != p.room.user.name) {
 			lastChatMessage = userName + message;
 			desktopAlert({
 		        title: userName,
