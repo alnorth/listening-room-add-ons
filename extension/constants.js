@@ -10,3 +10,14 @@ var lastfmLovedStatus = {
 	LOVE_SENT: 1,
 	LOVE_ACKNOWLEDGED: 2
 };
+
+var lastfmApiKey = "c0db7c8bfb98655ab25aa2e959fdcc68";
+var lastfmApiSecret = "aff4890d7cb9492bc72250abbeffc3e1";
+
+Storage.prototype.setObject = function(key, value) {
+    this.setItem(key, JSON.stringify(value));
+};
+
+Storage.prototype.getObject = function(key) {
+    return this.getItem(key) !== null && JSON.parse(this.getItem(key));
+};

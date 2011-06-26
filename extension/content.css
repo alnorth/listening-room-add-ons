@@ -103,9 +103,14 @@ div#addons_changelog_div {
 	text-align: left;
 }
 
-div#addons_settings_div table, div#addons_lastfmlogin table {
+div#addons_settings_div table {
 	margin-left: auto;
 	margin-right: auto;
+}
+
+div#addons_lastfmlogin p {
+	text-align: left;
+	padding-top: 10px;
 }
 
 a#addons_settings_cancel, a#addons_lastfm_cancel {

@@ -1,10 +1,10 @@
-function LastFmInterface() {
+function LastFmInterface(ls) {
 
 	var lastfm = new LastFM({
-		apiKey    : 'c0db7c8bfb98655ab25aa2e959fdcc68',
-		apiSecret : 'aff4890d7cb9492bc72250abbeffc3e1'
+		apiKey    : lastfmApiKey, // loaded from constants.js
+		apiSecret : lastfmApiSecret
 	});
-	var lastfmSession;
+	var lastfmSession = ls.getObject("lastfmsession");
 	
 	var callCallback = function(callback) {
 		return function() {
@@ -15,17 +15,19 @@ function LastFmInterface() {
 	};
 	
 	this.clearSession = function() {
-		lastfmSession = undefined;
+		lastfmSession = false;
+		ls.removeItem("lastfmsession");
 	};
 	
 	this.signedIn = function() {
-		return typeof(lastfmSession) !== "undefined";
+		return lastfmSession !== false;
 	};
 	
-	this.signIn = function(username, password, errCallback, callback) {
-		lastfm.auth.getMobileSession({username: username, password: password}, {
+	this.exchangeToken = function(token, errCallback, callback) {
+		lastfm.auth.getSession({token: token}, {
 			success: function(data){
 				lastfmSession = data.session;
+				ls.setObject("lastfmsession", lastfmSession);
 				if(callback) {
 					callback();
 				}

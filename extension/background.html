@@ -14,8 +14,7 @@
 		var currentTrack;
 		var lrdata = new LRDataInterface("lrdata.alnorth.com");
 		var settings = new Settings(window.localStorage);
-		var lfm = new LastFmInterface();
-		var lastfmUsername;
+		var lfm = new LastFmInterface(window.localStorage);
 		var tabsForTracks = {};
 		
 		function sendUpdatedTrackInfo(trackId) {
@@ -94,8 +93,7 @@
 				
 				sendResponse({"id": request.id});
 			} else if(request.type === "lastfmlogin") {
-				lastFmLoginData(request.login);
-				window.localStorage.setItem("lastfm_username", request.login.username);
+				doLastFmLogin(request.token);
 				sendResponse({});
 			} else if(request.type === "gethtml") {
 				$.get(request.url, function(data) {
@@ -135,10 +133,11 @@
 			});
 		}
 		
-		function lastFmLoginData(login) {
-			lastfmUsername = login.username;
-			
-			lfm.signIn(login.username, login.password, lastfmError, function() {
+		function doLastFmLogin(token) {
+			lfm.exchangeToken(token, lastfmError, function() {
+				chrome.tabs.getSelected(null, function(tab) {
+					chrome.tabs.sendRequest(tab.id, {type: "lastfmlogindone"}, function(response) {});
+				});
 				if(currentTrack) {
 					setNowPlaying(currentTrack);
 				}
@@ -148,7 +147,7 @@
 		function showLastfmLoginBox() {
 			if((settings.get("scrobble") || settings.get("showlastfmlovebutton")) && !lfm.signedIn()) {
 				chrome.tabs.getSelected(null, function(tab) {
-					chrome.tabs.sendRequest(tab.id, {type: "lastfmloginneeded", lastfmUsername: lastfmUsername}, function(response) {});
+					chrome.tabs.sendRequest(tab.id, {type: "lastfmloginneeded"}, function(response) {});
 				});
 			}
 		}
@@ -185,10 +184,6 @@
 		
 		function init() {
 			chrome.extension.onRequest.addListener(processMessage);
-			var storedLastfmUser = window.localStorage.getItem("lastfm_username");
-			if(storedLastfmUser) {
-				lastfmUsername = storedLastfmUser;
-			}
 			setInterval(pulse, 5000);
 		}
 		

@@ -171,13 +171,10 @@ function hideLastFmLogin() {
 	$("#addons_lastfmlogin").hide();
 }
 
-function sendLastFmLogin() {
-	var login = {};
-	login.username = $("#addons_lastfm_username").val();
-	login.password = $("#addons_lastfm_password").val();
-	$("#addons_lastfm_password").val("");
-	chrome.extension.sendRequest({type: "lastfmlogin", login:login}, function(response) {});
-	hideLastFmLogin();
+function showLastFmLoginPopup() {
+	var url = "http://www.last.fm/api/auth/?api_key=" + lastfmApiKey + "&cb=" + chrome.extension.getURL("lastfm_callback.html");
+	var lastfmWindow = window.open(url, "lastfm", "height=500,width=950");
+	if (window.focus) {lastfmWindow.focus()}
 }
 
 function dontDoLastFmLogin() {
@@ -204,10 +201,10 @@ function hideCharts() {
 
 function processMessage(request, sender, sendResponse) {
 	if(request.type === "lastfmloginneeded") {
-		if(request.lastfmUsername && $("#addons_lastfm_username").val() === "") {
-			$("#addons_lastfm_username").val(request.lastfmUsername);
-		}
 		showLastFmLogin();
+		sendResponse({});
+	} else if(request.type === "lastfmlogindone") {
+		hideLastFmLogin();
 		sendResponse({});
 	} else if(request.type === "updatedtrackinfo") {
 		updatedTrackInfo(request.id, request.info);
@@ -532,7 +529,7 @@ function init() {
 		
 		loadSettings();
 	
-		$("#addons_lastfm_button").click(sendLastFmLogin);
+		$("#addons_lastfm_button").click(showLastFmLoginPopup);
 		$("#addons_lastfm_cancel").click(dontDoLastFmLogin);
 		
 		charts.allTracks(0);
