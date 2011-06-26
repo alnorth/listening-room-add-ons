@@ -486,17 +486,9 @@ function checkForNewChatMessages() {
 	}
 }
 
-function desktopAlert(notificationObj) {
+function desktopAlert(notificationData) {
 	if(!focused) {
-		var notification = webkitNotifications.createNotification(
-			notificationObj.image?notificationObj.image:"",  // icon url - can be relative
-			notificationObj.title?notificationObj.title:"",  // notification title
-			notificationObj.body?notificationObj.body:""  // notification body text
-		);
-		notification.show();
-		setTimeout(function(){
-			notification.cancel();
-		}, notificationObj.timeout);
+		chrome.extension.sendRequest({type: "shownotification", notificationData: notificationData}, function(response) {});
 	}
 }
 
@@ -555,20 +547,6 @@ function init() {
 	window.addEventListener('blur', function() {
 		focused = false;
 	});
-	
-	if(window.webkitNotifications && window.webkitNotifications.checkPermission() != 0){
-        $("body").bind('click.enableDesktopNotify', function() {
-			window.webkitNotifications.requestPermission(function() {
-				desktopAlert({
-	                title: "",
-	                image: "",
-	                body: "Desktop notifications enabled.",
-	                timeout: 1
-	            });
-            	$("body").unbind('click.enableDesktopNotify');
-			});
-        });
-    }
 }
 
 init();

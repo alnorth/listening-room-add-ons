@@ -112,6 +112,9 @@
 			} else if(request.type === "initroom") {
 				initRoom(request.room);
 				sendResponse({});
+			} else if(request.type === "shownotification") {
+				showNotification(request.notificationData);
+				sendResponse({});
 			}
 		}
 		
@@ -131,6 +134,18 @@
 					db.setUserData(data[i].user_lr_id, data[i].username, sqlError, ignore);
 				}
 			});
+		}
+		
+		function showNotification(notificationData) {
+			var notification = webkitNotifications.createNotification(
+				notificationData.image ? notificationData.image : "",  // icon url - can be relative
+				notificationData.title ? notificationData.title : "",  // notification title
+				notificationData.body ? notificationData.body : ""  // notification body text
+			);
+			notification.show();
+			setTimeout(function(){
+				notification.cancel();
+			}, notificationData.timeout);
 		}
 		
 		function doLastFmLogin(token) {
