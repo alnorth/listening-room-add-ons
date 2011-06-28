@@ -65,7 +65,7 @@
 		
 		function setNowPlaying(track) {
 			if(settings.get("scrobble") && lfm.signedIn() && track.title && track.artist) {
-				lfm.setNowPlaying(track.artist, track.title, track.album, lastfmError);
+				lfm.setNowPlaying(track.artist, track.title, track.album, track.length, lastfmError);
 				db.saveLastFmStatus(track.id, lastfmStatus.PLAYING_SENT, sqlError, ignore);
 			}
 		}

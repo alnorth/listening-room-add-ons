@@ -59,7 +59,8 @@ function addTrackToDB(track, displayed) {
 		room: p.room.id,
 		timestamp: track.startTime || getTrackStartTimestamp(track.id),
 		reportedByUser: p.room.user.name,
-		reportedByUserId: p.room.user.id
+		reportedByUserId: p.room.user.id,
+		length: Math.floor(track.length / 1000)
 	};
 	if(user !== undefined) {
 		trackData.user = user.name;

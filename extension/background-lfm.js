@@ -60,7 +60,7 @@ function LastFmInterface(ls) {
 		lastfm.track.scrobble({track: title, timestamp: timestamp, artist: artist, album: album}, lastfmSession, {success: callCallback(callback), error: errCallback});
 	};
 	
-	this.setNowPlaying = function(artist, title, album, errCallback, callback) {
-		lastfm.track.updateNowPlaying({track: title, artist: artist, album: album}, lastfmSession, {success: callCallback(callback), error: errCallback});
+	this.setNowPlaying = function(artist, title, album, length, errCallback, callback) {
+		lastfm.track.updateNowPlaying({track: title, artist: artist, album: album, duration: length}, lastfmSession, {success: callCallback(callback), error: errCallback});
 	};
 }
