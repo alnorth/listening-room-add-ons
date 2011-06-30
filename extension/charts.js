@@ -203,11 +203,15 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 					cell.text(dt.chartsFormatted());
 					cell.addClass("nobreak");
 				} else if(columns[j].type) {
+					var rowDiv = $("<div />");
+					rowDiv.addClass("chart_row");
+					cell.append(rowDiv);
+					
 					var imgUrl = getImageUrl(dataRow, columns[j].type, altValues);
 					if(imgUrl !== "") {
 						var imgDiv = $("<div />");
 						imgDiv.addClass("chart_image");
-						cell.append(imgDiv);
+						rowDiv.append(imgDiv);
 						var img = $("<img />");
 						img.attr("src", imgUrl);
 						img.error(function () { 
@@ -215,10 +219,14 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 						});
 						imgDiv.append(img);
 					}
+					var linkDiv = $("<div />");
+					linkDiv.addClass("chart_link");
+					rowDiv.append(linkDiv);
+					
 					var link = $("<a />");
 					link.text(dataRow[columns[j].column]);
 					link.click(getLinkFunction(dataRow, columns[j].type, altValues));
-					cell.append(link);
+					linkDiv.append(link);
 				} else {
 					cell.text(dataRow[columns[j].column]);
 				}

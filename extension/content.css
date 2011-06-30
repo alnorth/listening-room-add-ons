@@ -45,35 +45,46 @@ div#addons_charts {
 div#addons_charts_table table {
 	margin-left: auto;
 	margin-right: auto;
-	border-collapse:collapse;
+	border-collapse: collapse;
+	border-spacing: 0px;
 }
 
 div#addons_charts_table table td, div#addons_charts_table table th {
-	padding-left: 10px;
-	padding-right: 10px;
+	padding: 2px 10px;
 	border: 1px solid #404040;
 }
 
 div#addons_charts_table table td {
 	font-size: smaller;
-	padding-top: 0px;
-	padding-bottom: 0px;
+	vertical-align: middle;
 }
 
 div#addons_charts_table table td a {
 	color: #333;
 }
 
+div#addons_charts_table table td div.chart_row {
+	height: 30px;
+	display: table-row;
+}
+
 div#addons_charts_table table td div.chart_image {
-	margin-left: -10px;
-	padding-right: 10px;
-	display: inline-block;
 	width: 30px;
 	height: 30px;
+	display: table-cell;
+	background-color: #EEE;
+	vertical-align: middle;
+	text-align: center;
 }
 
 div#addons_charts_table table td div.chart_image img {
 	vertical-align: middle;
+}
+
+div#addons_charts_table table td div.chart_row div.chart_link {
+	display: table-cell;
+	vertical-align: middle;
+	padding-left: 10px;
 }
 
 div#addons_charts_menu {
@@ -185,7 +196,7 @@ div.annotation:hover div.addons_chat_timestamp {
 	cursor: pointer;
 }
 
-td.nobreak {
+.nobreak {
 	white-space: nowrap;
 }
 
