@@ -193,6 +193,7 @@ function showCharts() {
 	showDimmer(hideCharts);
 	$("#addons_charts_div").height($(p).height() - 220);
 	$("#addons_charts").show();
+	charts.allTracks(0);
 }
 
 function hideCharts() {
@@ -246,7 +247,7 @@ function checkForNewTracks() {
 					if(artStyle !== "none") {
 						art = artStyle.slice(4, artStyle.length - 1);
 					} else {
-						art = lrdata.getTrackImageUrl(track.metadata.title, track.metadata.artist, track.metadata.album);
+						art = lrdata.getTrackImageUrl("record", track.metadata.title, track.metadata.artist, track.metadata.album);
 					}
 					
 					trackText += track.metadata.title;
@@ -405,7 +406,7 @@ function refreshRecordImages() {
 				}
 				var track = p.room.tracks[trackId];
 				if(track && track.metadata && track.metadata.title && track.metadata.artist && track.metadata.album) {
-					var url = lrdata.getTrackImageUrl(track.metadata.title, track.metadata.artist, track.metadata.album);
+					var url = lrdata.getTrackImageUrl("record", track.metadata.title, track.metadata.artist, track.metadata.album);
 					url = url.replace(/"/g, '\\"');
 					$(this).css("background-image", "url(\""+ url +"\")");
 					this.dataset.provider = "lrdata";
@@ -524,8 +525,6 @@ function init() {
 	
 		$("#addons_lastfm_button").click(showLastFmLoginPopup);
 		$("#addons_lastfm_cancel").click(dontDoLastFmLogin);
-		
-		charts.allTracks(0);
 	});
 	
 	$("#sponsor").after("<div id=\"addons_links\"></div>");

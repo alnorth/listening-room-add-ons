@@ -56,6 +56,24 @@ div#addons_charts_table table td, div#addons_charts_table table th {
 
 div#addons_charts_table table td {
 	font-size: smaller;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+div#addons_charts_table table td a {
+	color: #333;
+}
+
+div#addons_charts_table table td div.chart_image {
+	margin-left: -10px;
+	padding-right: 10px;
+	display: inline-block;
+	width: 30px;
+	height: 30px;
+}
+
+div#addons_charts_table table td div.chart_image img {
+	vertical-align: middle;
 }
 
 div#addons_charts_menu {

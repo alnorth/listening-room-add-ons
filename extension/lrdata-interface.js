@@ -30,12 +30,22 @@ function LRDataInterface(hostname, port) {
 	}
 	this.sendTrackData = sendTrackData;
 	
-	function getTrackImageUrl(title, artist, album) {
-		var url = urlRoot + "/trackimage/?";
-		url += $.param({title: title, artist: artist, album: album});
+	function getTrackImageUrl(size, title, artist, album) {
+		var url = urlRoot + "/image/track/"+ size +"/?";
+		url += $.param({title: title, artist: artist});
+		if(album) {
+			url += $.param({album: album});
+		}
 		return url;
 	}
 	this.getTrackImageUrl = getTrackImageUrl;
+	
+	function getArtistImageUrl(size, artist) {
+		var url = urlRoot + "/image/artist/"+ size +"/?";
+		url += $.param({artist: artist});
+		return url;
+	}
+	this.getArtistImageUrl = getArtistImageUrl;
 	
 	function getData(page, params, callback) {
 		var url = urlRoot +"/v1/"+ page +".json?callback=?";

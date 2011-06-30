@@ -169,6 +169,17 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 		}
 	}
 	
+	function getImageUrl(dataRow, type, altValues) {
+		switch(type) {
+		case "art":
+			return lrdata.getArtistImageUrl("charts", getValWithFallback(dataRow, "artist_name", altValues));
+		case "t":
+			return lrdata.getTrackImageUrl("charts", getValWithFallback(dataRow, "track_title", altValues), getValWithFallback(dataRow, "artist_name", altValues));
+		case "u":
+			return "";
+		}
+	}
+	
 	function renderTable(data, columns, altValues, nextPageFn) {
 		var div = $("#" + tableDivId);
 		div.empty();
@@ -192,6 +203,18 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 					cell.text(dt.chartsFormatted());
 					cell.addClass("nobreak");
 				} else if(columns[j].type) {
+					var imgUrl = getImageUrl(dataRow, columns[j].type, altValues);
+					if(imgUrl !== "") {
+						var imgDiv = $("<div />");
+						imgDiv.addClass("chart_image");
+						cell.append(imgDiv);
+						var img = $("<img />");
+						img.attr("src", imgUrl);
+						img.error(function () { 
+							$(this).hide();
+						});
+						imgDiv.append(img);
+					}
 					var link = $("<a />");
 					link.text(dataRow[columns[j].column]);
 					link.click(getLinkFunction(dataRow, columns[j].type, altValues));
