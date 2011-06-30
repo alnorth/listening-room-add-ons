@@ -529,10 +529,26 @@ function init() {
 	
 	$("#sponsor").after("<div id=\"addons_links\"></div>");
 	chrome.extension.sendRequest({type: "gethtml", url:"links.html"}, function(response) {
-		$("#addons_links").html(response);
+		var roomLinks = roomSpecificLinks[p.room.id];
+		if(roomLinks) {
+			var ul = $("<ul />");
+			var i;
+			for(i = 0; i < roomLinks.length; i++) {
+				var link = $("<a />");
+				link.text(roomLinks[i].text);
+				link.attr("href", roomLinks[i].url);
+				link.attr("target", "_blank");
+				
+				ul.append($("<li />").append(link));
+			}
+			$("#addons_links").append($("<h3 />").text($("h1").text()));
+			$("#addons_links").append(ul);
+		}
+		
+		$("#addons_links").append(response);
 		$("#addons_charts_link").click(showCharts);
 		$("#addons_settings_link").click(showSettings);
-		$("#addons_changelog_link").click(showChangelog);
+		$("#addons_changelog_link").click(showChangelog);		
 	});
 	
 	setInterval(pulse, 1000);

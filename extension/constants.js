@@ -21,3 +21,12 @@ Storage.prototype.setObject = function(key, value) {
 Storage.prototype.getObject = function(key) {
     return this.getItem(key) !== null && JSON.parse(this.getItem(key));
 };
+
+var roomSpecificLinks = {
+	"4d6f04d78dc336ba42000005": [
+		{url: "http://typetochat.me", text: "Type to chat"},
+		{url: "http://qwantzlistens.tumblr.com", text: "Tumblr"},
+		{url: "http://typetochat.me/poll", text: "HDJ Poll"},
+		{url: "http://typetochat.me/wiki/", text: "Wiki"}
+	]
+};
