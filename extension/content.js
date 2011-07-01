@@ -4,7 +4,7 @@ var p = pDiv.onclick();
 
 var $ = p.$,
 	lrdata = new LRDataInterface("lrdata.alnorth.com"),
-	charts = new Charts(p.room.id, lrdata, "addons_charts_menu", "addons_charts_table"),
+	charts = new Charts(p.room.id, lrdata, "addons_charts_menu", "addons_charts_table", "addons_charts_loader"),
 	settings,
 	storedTrackInfo = {},
 	recordsWithArtInCss = {},
@@ -520,6 +520,8 @@ function init() {
 		$("#addons_settings_cancel").click(hideSettings);
 		$("#addons_changelog_close").click(hideChangelog);
 		$("#addons_charts_close").click(hideCharts);
+		
+		$("#addons_charts_loader").append($("<img />").attr("src", chrome.extension.getURL("ajax-loader.gif")));
 		
 		loadSettings();
 	

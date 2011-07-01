@@ -1,4 +1,4 @@
-function Charts(room, lrdata, menuDivId, tableDivId) {
+function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	
 	// From http://code.google.com/p/flexible-js-formatting/
 	String.leftPad = function (val, size, ch) {
@@ -145,8 +145,15 @@ function Charts(room, lrdata, menuDivId, tableDivId) {
 				params[key] = extraParams[key];
 			}
 		}
+		
+		$("#" + tableDivId).hide();
+		$("#" + loaderDivId).show();
+		
 		lrdata.getData(pageName, params, function(data) {
 			renderTable(data, columnProfile, altValues, nextPageFn);
+			
+			$("#" + tableDivId).show();
+			$("#" + loaderDivId).hide();
 		});
 	}
 	

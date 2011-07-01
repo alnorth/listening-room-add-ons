@@ -112,6 +112,11 @@ div#addons_charts_menu h3 {
 	margin-bottom: 5px;
 }
 
+div#addons_charts_loader {
+	text-align: center;
+	padding: 20px;
+}
+
 div#addons_settings_div, div#addons_changelog_div, div#addons_charts_div {
 	height: 300px;
 	overflow: auto;
