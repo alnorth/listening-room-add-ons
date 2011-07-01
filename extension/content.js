@@ -193,7 +193,6 @@ function showCharts() {
 	showDimmer(hideCharts);
 	$("#addons_charts_div").height($(p).height() - 220);
 	$("#addons_charts").show();
-	charts.allTracks(0);
 }
 
 function hideCharts() {
@@ -548,7 +547,7 @@ function init() {
 		}
 		
 		$("#addons_links").append(response);
-		$("#addons_charts_link").click(showCharts);
+		$("#addons_charts_link").click(function() {charts.allTracks(0); showCharts();});
 		$("#addons_settings_link").click(showSettings);
 		$("#addons_changelog_link").click(showChangelog);		
 	});
