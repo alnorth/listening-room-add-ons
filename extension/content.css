@@ -114,7 +114,7 @@ div#addons_charts_menu h3 {
 
 div#addons_charts_loader {
 	text-align: center;
-	padding: 20px;
+	padding: 100px 0;
 }
 
 div#addons_settings_div, div#addons_changelog_div, div#addons_charts_div {
