@@ -32,9 +32,8 @@ var roomSpecificLinks = {
 };
 
 var changeLog = {
-	"0.10.4": [
-		"Add a loading indicator for the charts.",
-		"Fixed a bug with the chart links on tracks."
+	"0.10.5": [
+		"Fixed a bug with track art loading."
 	],
 	"0.10.4": [
 		"Add a loading indicator for the charts.",
