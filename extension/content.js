@@ -503,6 +503,30 @@ function setRecordRefreshRate() {
 	p.lr.FPS = settings.recordrefreshrate;
 }
 
+function addChangeLog() {
+	$("#addons").append('<div id="addons_changelog">\
+			<h3>Add-ons Change Log</h3>\
+			<div id="addons_changelog_div"/>\
+			<a id="addons_changelog_close" href="javascript:void(0);">Close</a>\
+		</div>');
+		
+	var changelogDiv = $("#addons_changelog_div"),
+		v = 0,
+		i = 0,
+		ul = false;
+	
+	for(v in changeLog) {
+		if(typeof(changeLog[v] !== "function")) {
+			changelogDiv.append($("<h4 />").text(v));
+			ul = $("<ul />");
+			changelogDiv.append(ul);
+			for(i = 0; i < changeLog[v].length; i++) {
+				ul.append($("<li />").text(changeLog[v][i]));
+			}
+		}
+	}
+}
+
 function pulse() {
 	checkForNewTracks();
 	linkifyTwitterNames();
@@ -514,6 +538,8 @@ function init() {
 	$("body").append("<div id=\"addons\"></div>");
 	chrome.extension.sendRequest({type: "gethtml", url:"popups.html"}, function(response) {
 		$("#addons").html(response);
+		
+		addChangeLog();
 		
 		$("#addons_settings_save").click(saveSettings);
 		$("#addons_settings_cancel").click(hideSettings);
