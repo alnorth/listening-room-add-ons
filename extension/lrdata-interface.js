@@ -34,7 +34,7 @@ function LRDataInterface(hostname, port) {
 		var url = urlRoot + "/image/track/"+ size +"/?";
 		url += $.param({title: title, artist: artist});
 		if(album) {
-			url += $.param({album: album});
+			url += "&" + $.param({album: album});
 		}
 		return url;
 	}
