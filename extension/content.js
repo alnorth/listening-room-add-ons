@@ -245,7 +245,7 @@ function checkForNewTracks() {
 				if(user && track.metadata && track.metadata.title) {
 					if(artStyle !== "none") {
 						art = artStyle.slice(4, artStyle.length - 1);
-					} else {
+					} else if(track.metadata.artist) {
 						art = lrdata.getTrackImageUrl("record", track.metadata.title, track.metadata.artist, track.metadata.album);
 					}
 					
@@ -404,7 +404,7 @@ function refreshRecordImages() {
 					trackId = this.parentNode.parentNode.id.replace("record-", "");
 				}
 				var track = p.room.tracks[trackId];
-				if(track && track.metadata && track.metadata.title && track.metadata.artist && track.metadata.album) {
+				if(track && track.metadata && track.metadata.title && track.metadata.artist) {
 					var url = lrdata.getTrackImageUrl("record", track.metadata.title, track.metadata.artist, track.metadata.album);
 					url = url.replace(/"/g, '\\"');
 					$(this).css("background-image", "url(\""+ url +"\")");
