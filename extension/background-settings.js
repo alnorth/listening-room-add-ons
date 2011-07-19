@@ -6,6 +6,7 @@ function Settings(ls) {
 		"albumart": true,
 		"twitterusernamelinks": true,
 		"showchattimestamps": true,
+		"showtracktimes": true,
 		"showchatnotifications": true,
 		"showsongnotifications": true,
 		"notificationtimeout": 10,
