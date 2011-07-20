@@ -363,6 +363,28 @@ function updateSingleTrackData(trackId, el) {
 					trackDataEl.append(artistLink);
 				}
 			}
+			if (settings.showtracktimes) {
+				var len_full;
+				var len_hour;
+				var lengthSpan = $('<span />').attr('class', 'addons_tracklength').attr('id', 'track_time_' + track.id);
+				var len = (track.length / 1000);
+				var len_min = Math.floor(len / 60);
+				var len_sec = Math.round(len % 60);
+
+				len_sec = (('' + len_sec).length == 1) ? ('0' + len_sec) : ('' + len_sec);
+
+				if (len_min > 60) {
+					len_hour = Math.floor(len_min / 60);
+					len_min  = len_min % 60;
+					len_min  = (('' + len_min).length == 1) ? ('0' + len_min) : ('' + len_min);
+
+					len_full = [len_hour, len_min, len_sec].join(':');
+				} else {
+					len_full = [len_min, len_sec].join(':');
+				}
+
+				trackDataEl.append(lengthSpan.append(len_full));
+			}
 			
 		} else {
 			fetchTrackInfo(trackId);

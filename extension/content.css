@@ -179,6 +179,15 @@ div.addons_trackdata img {
 	margin-left: 1px;
 }
 
+div.addons_trackdata span.addons_tracklength {
+	margin-left: 1em;
+	vertical-align: top;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	color: #998;
+	line-height: 1.5;
+	font-size: 13px;
+}
+
 div.addons_chat_timestamp {
 	float: right;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
