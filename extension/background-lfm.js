@@ -4,7 +4,10 @@ function LastFmInterface(ls) {
 		apiKey    : lastfmApiKey, // loaded from constants.js
 		apiSecret : lastfmApiSecret
 	});
-	var lastfmSession = ls.getObject("lastfmsession");
+	var lastfmSession = false;
+	if(ls) {
+		lastfmSession = ls.getObject("lastfmsession");
+	}
 	
 	var callCallback = function(callback) {
 		return function() {
@@ -62,5 +65,9 @@ function LastFmInterface(ls) {
 	
 	this.setNowPlaying = function(artist, title, album, length, errCallback, callback) {
 		lastfm.track.updateNowPlaying({track: title, artist: artist, album: album, duration: length}, lastfmSession, {success: callCallback(callback), error: errCallback});
+	};
+	
+	this.getArtistData = function(artist, errCallback, callback) {
+		lastfm.artist.getInfo({artist: artist}, {success: callCallback(callback), error: errCallback});
 	};
 }
