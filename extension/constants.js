@@ -32,6 +32,9 @@ var roomSpecificLinks = {
 };
 
 var changeLog = {
+	"0.11": [
+		"Show track lengths, courtesy of @sycobuny."
+	],
 	"0.10.5": [
 		"Fixed a bug with track art loading."
 	],
