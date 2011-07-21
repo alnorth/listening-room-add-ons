@@ -23,14 +23,10 @@ function Database() {
 		if(currentVersion === 0) {
 			tx.executeSql('insert into DB_DATA(version) values (1)', [], ignore, logError);
 			tx.executeSql('alter table TRACK_PLAY add column lastfm_loved int', [], ignore, logError);
-			currentVersion = 1;
-		}
-		if(currentVersion === 1) {
-			tx.executeSql('alter table TRACK_PLAY add column album_art text', [], ignore, logError);
 			tx.executeSql('update DB_DATA set version = 2', [], ignore, logError);
 			currentVersion = 2;
 		}
-		if(currentVersion === 2) {
+		if(currentVersion === 1 || currentVersion === 2) {
 			tx.executeSql('alter table TRACK_PLAY add column user_id text', [], ignore, logError);
 			tx.executeSql('alter table TRACK_PLAY add column room text', [], ignore, logError);
 			tx.executeSql('update DB_DATA set version = 3', [], ignore, logError);
