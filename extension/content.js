@@ -557,6 +557,7 @@ function pulse() {
 }
 
 function init() {
+	$("head").append('<link href="'+ chrome.extension.getURL("content.css") +'" rel="stylesheet" type="text/css" />');
 	$("body").append("<div id=\"addons\"></div>");
 	chrome.extension.sendRequest({type: "gethtml", url:"popups.html"}, function(response) {
 		$("#addons").html(response);
