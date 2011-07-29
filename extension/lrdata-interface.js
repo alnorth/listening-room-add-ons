@@ -1,8 +1,12 @@
-function LRDataInterface(hostname, port) {
+function LRDataInterface(hostname, port, imageHostname, imagePort) {
 
-	var urlRoot = "http://"+ hostname
+	var urlRoot = "http://"+ hostname;
 	if(port) {
 		urlRoot += ":"+ port;
+	}
+	var imageUrlRoot = "http://"+ imageHostname;
+	if(imagePort) {
+		imageUrlRoot += ":"+ imagePort;
 	}
 	
 	function sendTrackData(track, callback) {
@@ -31,7 +35,7 @@ function LRDataInterface(hostname, port) {
 	this.sendTrackData = sendTrackData;
 	
 	function getTrackImageUrl(size, title, artist, album) {
-		var url = urlRoot + "/image/track/"+ size +"/?";
+		var url = imageUrlRoot + "/image/track/"+ size +"/?";
 		url += $.param({title: title, artist: artist});
 		if(album) {
 			url += "&" + $.param({album: album});
@@ -41,14 +45,14 @@ function LRDataInterface(hostname, port) {
 	this.getTrackImageUrl = getTrackImageUrl;
 	
 	function getArtistImageUrl(size, artist) {
-		var url = urlRoot + "/image/artist/"+ size +"/?";
+		var url = imageUrlRoot + "/image/artist/"+ size +"/?";
 		url += $.param({artist: artist});
 		return url;
 	}
 	this.getArtistImageUrl = getArtistImageUrl;
 	
 	function getData(page, params, callback) {
-		var url = urlRoot +"/v1/"+ page +".json?callback=?";
+		var url = imageUrlRoot +"/v1/"+ page +".json?callback=?";
 		$.getJSON(
 			url,
 			params,

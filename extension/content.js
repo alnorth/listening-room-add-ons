@@ -3,7 +3,7 @@ pDiv.setAttribute("onclick", "return window;");
 var p = pDiv.onclick();
 
 var $ = p.$,
-	lrdata = new LRDataInterface("lrdata.alnorth.com"),
+	lrdata = new LRDataInterface("lrdata.alnorth.com", 80, "lrdata-images.alnorth.com", 80),
 	charts = new Charts(p.room.id, lrdata, "addons_charts_menu", "addons_charts_table", "addons_charts_loader"),
 	settings,
 	storedTrackInfo = {},

@@ -32,6 +32,9 @@ var roomSpecificLinks = {
 };
 
 var changeLog = {
+	"0.11.1": [
+		"Improved responsiveness of charts by loading images from a different hostname."
+	],
 	"0.11": [
 		"Show track lengths, courtesy of @sycobuny."
 	],
