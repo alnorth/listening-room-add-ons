@@ -48,6 +48,11 @@ function Database() {
 			tx.executeSql('update DB_DATA set version = 5', [], ignore, logError);
 			currentVersion = 5;
 		}
+		if(currentVersion === 5) {
+			tx.executeSql('delete from USER where username = ?', ['undefined'], ignore, logError);
+			tx.executeSql('update DB_DATA set version = 6', [], ignore, logError);
+			currentVersion = 6;
+		}
 	};
 	
 	var init = function() {
@@ -75,17 +80,19 @@ function Database() {
 	
 	// This one is called by addTrackToDB in a database callback, so we need to be able to refrence it without using "this".
 	var setUserData = function(id, username, errCallback, callback) {
-		webDb.transaction(function(tx) {
-			tx.executeSql('select username from USER where id = ?', [id], function(tx, rs) {
-				if(rs.rows.length === 1) {
-					if(!rs.rows.item(0).username || rs.rows.item(0).username === "") {
-						tx.executeSql('update USER set username = ? where id = ?', [username, id], callCallback(callback), errCallback);
+		if(typeof(username) !== "undefined") {
+			webDb.transaction(function(tx) {
+				tx.executeSql('select username from USER where id = ?', [id], function(tx, rs) {
+					if(rs.rows.length === 1) {
+						if(!rs.rows.item(0).username || rs.rows.item(0).username === "") {
+							tx.executeSql('update USER set username = ? where id = ?', [username, id], callCallback(callback), errCallback);
+						}
+					} else {
+						tx.executeSql('insert into USER(id, username) values (?, ?)', [id, username], callCallback(callback), errCallback);
 					}
-				} else {
-					tx.executeSql('insert into USER(id, username) values (?, ?)', [id, username], callCallback(callback), errCallback);
-				}
-			}, errCallback);
-		});
+				}, errCallback);
+			});
+		}
 	};
 	this.setUserData = setUserData;
 	
