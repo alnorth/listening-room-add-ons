@@ -83,7 +83,7 @@
 		function processMessage(request, sender, sendResponse) {
 			if(request.type === "addtracktodb") {
 				tabsForTracks[request.track.id] = sender.tab.id;
-				db.addTrackToDB(request.track, request.isCurrent, lfm.signedIn(), settings.get("senddata"), sqlError);
+				db.addTrackToDB(request.track, request.isCurrent, lfm.signedIn(), settings.get("onlyscrobbleowntracks"), settings.get("senddata"), sqlError);
 				
 				if(request.isCurrent) {
 					currentTrack = request.track;

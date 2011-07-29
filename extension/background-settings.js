@@ -16,6 +16,7 @@ function Settings(ls) {
 		"showchartlinks": true,
 		
 		"scrobble": true,
+		"onlyscrobbleowntracks": false,
 		"lastfmlink": true,
 		"showscrobblestatus": true,
 		"showlastfmlovebutton": true

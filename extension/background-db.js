@@ -89,11 +89,14 @@ function Database() {
 	};
 	this.setUserData = setUserData;
 	
-	this.addTrackToDB = function(trackData, isCurrent, scrobbling, sendData, errCallback) {
+	this.addTrackToDB = function(trackData, isCurrent, scrobbling, onlyScrobbleOwnTracks, sendData, errCallback) {
 		webDb.transaction(function(tx) {
 			tx.executeSql('select count(*) as num from TRACK_PLAY where id = ?', [trackData.id], function(tx2, rs) {
 					if(parseInt(rs.rows.item(0).num, 10) === 0) {
 						setUserData(trackData.userId, trackData.user, errCallback, ignore);
+						
+						var scrobble = scrobbling && isCurrent && (!onlyScrobbleOwnTracks || trackData.reportedByUserId === trackData.userId);
+						
 						tx2.executeSql('insert into TRACK_PLAY ' +
 							'(id, artist, title, album, date, lastfm_status, lastfm_url, user_id, room, reported_by_user, reported_by_user_id, send_data)' + 
 							'values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -102,7 +105,7 @@ function Database() {
 								undefinedToBlank(trackData.title),
 								undefinedToBlank(trackData.album),
 								trackData.timestamp,
-								scrobbling && isCurrent ? lastfmStatus.UNSENT : lastfmStatus.SCROBBLING_DISABLED,
+								scrobble ? lastfmStatus.UNSENT : lastfmStatus.SCROBBLING_DISABLED,
 								'',
 								trackData.userId,
 								trackData.room,

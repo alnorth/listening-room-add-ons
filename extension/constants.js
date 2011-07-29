@@ -33,7 +33,8 @@ var roomSpecificLinks = {
 
 var changeLog = {
 	"0.11.1": [
-		"Improved responsiveness of charts by loading images from a different hostname."
+		"Improved responsiveness of charts by loading images from a different hostname.",
+		"Added the option to only scrobble your own tracks."
 	],
 	"0.11": [
 		"Show track lengths, courtesy of @sycobuny."
