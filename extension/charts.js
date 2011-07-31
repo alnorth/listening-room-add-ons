@@ -129,9 +129,14 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	}
 	this.user_tracks = user_tracks;
 	
+	function user_tags(username, page) {
+		menu("users", username, "tags", [username, 0]);
+		tagCloud(username);
+	}
+	this.user_tags = user_tags;
+	
 	function user_plays(username, page) {
 		menu("users", username, "plays", [username, 0]);
-		tagCloud(username);
 		loadAndRender("user", {type: "all_plays", username: username}, page, colProfiles.track_artist_play, {}, function() {
 			user_plays(username, page + 1);
 		});
@@ -278,6 +283,7 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 		users: [
 			{title: "Artists", id: "artists", func: user_artists},
 			{title: "Tracks", id: "tracks", func: user_tracks},
+			{title: "Tags", id: "tags", func: user_tags},
 			{title: "Plays", id: "plays", func: user_plays}
 		]
 	};
@@ -292,6 +298,7 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	
 	function buildMenu(menuDesc, selected, clickGenerator, args) {
 		var div = $("<div />");
+		div.addClass("addons_charts_menu_" + menuDesc.length);
 		var i;
 		for(i = 0; i < menuDesc.length; i++) {
 			var a = $("<a />").text(menuDesc[i].title);
@@ -324,9 +331,13 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	}
 
 	function tagCloud(username) {
-		var div = $("#" + menuDivId);
+		var div = $("#" + tableDivId);
+		div.empty();
 		
-		apiCall("user", {type: "tags", username: username, limit: 40}, 0, function(data) {
+		$("#" + tableDivId).hide();
+		$("#" + loaderDivId).show();
+		
+		apiCall("user", {type: "tags", username: username, limit: 60}, 0, function(data) {
 			var ul = $("<ul />").addClass("addons_tagcloud"),
 				i;
 			
@@ -336,7 +347,10 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 			
 			div.append(ul);
 			
-			ul.tagcloud({colormin: "AAA", colormax: "111"});
+			$("#" + tableDivId).show();
+			$("#" + loaderDivId).hide();
+			
+			ul.tagcloud({colormin: "AAA", colormax: "111", type: "sphere", power: 0.3});
 		});
 	}
 }
