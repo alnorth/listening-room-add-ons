@@ -558,6 +558,8 @@ function pulse() {
 
 function init() {
 	$("head").append('<link href="'+ chrome.extension.getURL("content.css") +'" rel="stylesheet" type="text/css" />');
+	$("head").append('<script src="'+ chrome.extension.getURL("jquery.tagcloud.min.js") +'" type="text/javascript" ></script>');
+	$("head").append('<script src="'+ chrome.extension.getURL("jquery.tinysort.min.js") +'" type="text/javascript" ></script>');
 	$("body").append("<div id=\"addons\"></div>");
 	chrome.extension.sendRequest({type: "gethtml", url:"popups.html"}, function(response) {
 		$("#addons").html(response);

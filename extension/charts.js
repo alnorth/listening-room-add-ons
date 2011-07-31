@@ -131,13 +131,14 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	
 	function user_plays(username, page) {
 		menu("users", username, "plays", [username, 0]);
+		tagCloud(username);
 		loadAndRender("user", {type: "all_plays", username: username}, page, colProfiles.track_artist_play, {}, function() {
 			user_plays(username, page + 1);
 		});
 	}
 	this.user_plays = user_plays;
 	
-	function loadAndRender(pageName, extraParams, pageNo, columnProfile, altValues, nextPageFn) {
+	function apiCall(pageName, extraParams, pageNo, callback) {
 		var params = {room: room, limit: 200, offset: pageNo * 200};
 		var key;
 		for (key in extraParams) {
@@ -146,10 +147,14 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 			}
 		}
 		
+		lrdata.getData(pageName, params, callback);
+	}
+	
+	function loadAndRender(pageName, extraParams, pageNo, columnProfile, altValues, nextPageFn) {		
 		$("#" + tableDivId).hide();
 		$("#" + loaderDivId).show();
 		
-		lrdata.getData(pageName, params, function(data) {
+		apiCall(pageName, extraParams, pageNo, function(data) {
 			renderTable(data, columnProfile, altValues, nextPageFn);
 			
 			$("#" + tableDivId).show();
@@ -318,4 +323,20 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 		}
 	}
 
+	function tagCloud(username) {
+		var div = $("#" + menuDivId);
+		
+		apiCall("user", {type: "tags", username: username, limit: 40}, 0, function(data) {
+			var ul = $("<ul />").addClass("addons_tagcloud"),
+				i;
+			
+			for(i = 0; i < data.length; i++) {
+				ul.append($("<li />").attr("value", data[i].tag_count).text(data[i].tag_name));
+			}
+			
+			div.append(ul);
+			
+			ul.tagcloud({colormin: "AAA", colormax: "111"});
+		});
+	}
 }

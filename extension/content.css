@@ -216,3 +216,8 @@ div.annotation:hover div.addons_chat_timestamp {
 div.more_link {
 	text-align: right;
 }
+
+ul.addons_tagcloud {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
