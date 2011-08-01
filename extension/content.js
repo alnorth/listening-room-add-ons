@@ -339,7 +339,7 @@ function updateSingleTrackData(trackId, el) {
 				var userLink = $("<a />").attr("href", "javascript:void(0);").attr("title", "User chart data");
 				userLink.append($("<img />").css("border", "0px").attr("src", chrome.extension.getURL("user-link.png")));
 				userLink.click(function() {
-					charts.user_artists(trackInfo.user, 0);
+					charts.user_activity(trackInfo.user, 0);
 					showCharts();
 				});
 				trackDataEl.append(userLink);
