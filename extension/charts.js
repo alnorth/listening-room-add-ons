@@ -65,6 +65,12 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	}
 	this.track_users = track_users;
 	
+	function track_tags(trackTitle, artistName, page) {
+		menu("tracks", trackTitleEl(trackTitle, artistName), "tags", [trackTitle, artistName, 0]);
+		tagCloud("track", {type: "tags", artist_name: artistName, track_title: trackTitle, limit: 60});
+	}
+	this.track_tags = track_tags;
+	
 	function track_plays(trackTitle, artistName, page) {
 		menu("tracks", trackTitleEl(trackTitle, artistName), "plays", [trackTitle, artistName, 0]);
 		loadAndRender("track", {type: "all_plays", artist_name: artistName, track_title: trackTitle}, page, colProfiles.user_play, {}, function() {
@@ -96,6 +102,12 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 		});
 	}
 	this.artist_users = artist_users;
+	
+	function artist_tags(artistName, page) {
+		menu("artists", artistName, "tags", [artistName, 0]);
+		tagCloud("artist", {type: "tags", artist_name: artistName, limit: 60});
+	}
+	this.artist_tags = artist_tags;
 	
 	function artist_plays(artistName, page) {
 		menu("artists", artistName, "plays", [artistName, 0]);
@@ -129,6 +141,12 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	}
 	this.user_tracks = user_tracks;
 	
+	function user_tags(username, page) {
+		menu("users", username, "tags", [username, 0]);
+		tagCloud("user", {type: "tags", username: username, limit: 60});
+	}
+	this.user_tags = user_tags;
+	
 	function user_plays(username, page) {
 		menu("users", username, "plays", [username, 0]);
 		loadAndRender("user", {type: "all_plays", username: username}, page, colProfiles.track_artist_play, {}, function() {
@@ -137,7 +155,7 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	}
 	this.user_plays = user_plays;
 	
-	function loadAndRender(pageName, extraParams, pageNo, columnProfile, altValues, nextPageFn) {
+	function apiCall(pageName, extraParams, pageNo, callback) {
 		var params = {room: room, limit: 200, offset: pageNo * 200};
 		var key;
 		for (key in extraParams) {
@@ -146,10 +164,14 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 			}
 		}
 		
+		lrdata.getData(pageName, params, callback);
+	}
+	
+	function loadAndRender(pageName, extraParams, pageNo, columnProfile, altValues, nextPageFn) {		
 		$("#" + tableDivId).hide();
 		$("#" + loaderDivId).show();
 		
-		lrdata.getData(pageName, params, function(data) {
+		apiCall(pageName, extraParams, pageNo, function(data) {
 			renderTable(data, columnProfile, altValues, nextPageFn);
 			
 			$("#" + tableDivId).show();
@@ -263,16 +285,19 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	var secondLevelMenus = {
 		tracks: [
 			{title: "Users", id: "users", func: track_users},
+			{title: "Tags", id: "tags", func: track_tags},
 			{title: "Plays", id: "plays", func: track_plays}
 		],
 		artists: [
 			{title: "Tracks", id: "tracks", func: artist_tracks},
 			{title: "Users", id: "users", func: artist_users},
+			{title: "Tags", id: "tags", func: artist_tags},
 			{title: "Plays", id: "plays", func: artist_plays}
 		],
 		users: [
 			{title: "Artists", id: "artists", func: user_artists},
 			{title: "Tracks", id: "tracks", func: user_tracks},
+			{title: "Tags", id: "tags", func: user_tags},
 			{title: "Plays", id: "plays", func: user_plays}
 		]
 	};
@@ -287,6 +312,7 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	
 	function buildMenu(menuDesc, selected, clickGenerator, args) {
 		var div = $("<div />");
+		div.addClass("addons_charts_menu_" + menuDesc.length);
 		var i;
 		for(i = 0; i < menuDesc.length; i++) {
 			var a = $("<a />").text(menuDesc[i].title);
@@ -318,4 +344,27 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 		}
 	}
 
+	function tagCloud(pageName, extraParams) {
+		var div = $("#" + tableDivId);
+		div.empty();
+		
+		$("#" + tableDivId).hide();
+		$("#" + loaderDivId).show();
+		
+		apiCall(pageName, extraParams, 0, function(data) {
+			var ul = $("<ul />").addClass("addons_tagcloud"),
+				i;
+			
+			for(i = 0; i < data.length; i++) {
+				ul.append($("<li />").attr("value", data[i].tag_count).text(data[i].tag_name));
+			}
+			
+			div.append(ul);
+			
+			$("#" + tableDivId).show();
+			$("#" + loaderDivId).hide();
+			
+			ul.tagcloud({colormin: "AAA", colormax: "111", type: "sphere", power: 0.3});
+		});
+	}
 }

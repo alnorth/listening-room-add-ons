@@ -1,12 +1,11 @@
 {
 	"name": "Listening Room Add-ons",
-	"version": "0.11",
+	"version": "0.11.1",
 	"description": "Charts, UI enhancements and scrobbling for Listening Room.",
 	"background_page": "background.html",
 	"content_scripts": [
 		{
 		"matches": ["http://listeningroom.net/room/*", "http://www.listeningroom.net/room/*", "http://listeningroom.fettig.net/room/*"],
-		"css": ["content.css"],
 		"js": ["constants.js", "lrdata-interface.js", "charts.js", "content.js"]
 		}
 	],

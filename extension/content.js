@@ -3,7 +3,7 @@ pDiv.setAttribute("onclick", "return window;");
 var p = pDiv.onclick();
 
 var $ = p.$,
-	lrdata = new LRDataInterface("lrdata.alnorth.com"),
+	lrdata = new LRDataInterface("lrdata.alnorth.com", 80, "lrdata-images.alnorth.com", 80),
 	charts = new Charts(p.room.id, lrdata, "addons_charts_menu", "addons_charts_table", "addons_charts_loader"),
 	settings,
 	storedTrackInfo = {},
@@ -557,6 +557,9 @@ function pulse() {
 }
 
 function init() {
+	$("head").append('<link href="'+ chrome.extension.getURL("content.css") +'?time='+ (new Date()).getTime() +'" rel="stylesheet" type="text/css" />');
+	$("head").append('<script src="'+ chrome.extension.getURL("jquery.tagcloud.min.js") +'" type="text/javascript" ></script>');
+	$("head").append('<script src="'+ chrome.extension.getURL("jquery.tinysort.min.js") +'" type="text/javascript" ></script>');
 	$("body").append("<div id=\"addons\"></div>");
 	chrome.extension.sendRequest({type: "gethtml", url:"popups.html"}, function(response) {
 		$("#addons").html(response);

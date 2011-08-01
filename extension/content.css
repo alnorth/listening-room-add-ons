@@ -97,10 +97,17 @@ div#addons_charts_menu a {
 
 div#addons_charts_menu div a {
 	display: inline-block;
-	width: 240px;
 	padding-top: 5px;
 	padding-bottom: 5px;
 	text-align: center;
+}
+
+div#addons_charts_menu div.addons_charts_menu_3 a {
+	width: 240px;
+}
+
+div#addons_charts_menu div.addons_charts_menu_4 a {
+	width: 180px;
 }
 
 div#addons_charts_menu a:hover, div#addons_charts_menu a.selected {
@@ -215,4 +222,9 @@ div.annotation:hover div.addons_chat_timestamp {
 
 div.more_link {
 	text-align: right;
+}
+
+ul.addons_tagcloud {
+	margin-top: 10px;
+	margin-bottom: 10px;
 }

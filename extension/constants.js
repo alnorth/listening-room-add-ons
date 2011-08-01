@@ -32,6 +32,13 @@ var roomSpecificLinks = {
 };
 
 var changeLog = {
+	"0.11.1": [
+		"Added a tag cloud display for users, tracks and artists, with tags taken from Last.fm.",
+		"Improved responsiveness of charts by loading images from a different hostname.",
+		"Added the option to only scrobble your own tracks.",
+		"Fixed a bug that could cause a username to be stored as 'undefined' and so break the chart links for that user.",
+		"Loading CSS in a different way to stop the page getting messed up when the extension updates."
+	],
 	"0.11": [
 		"Show track lengths, courtesy of @sycobuny."
 	],
