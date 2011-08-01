@@ -110,6 +110,10 @@ div#addons_charts_menu div.addons_charts_menu_4 a {
 	width: 180px;
 }
 
+div#addons_charts_menu div.addons_charts_menu_5 a {
+	width: 144px;
+}
+
 div#addons_charts_menu a:hover, div#addons_charts_menu a.selected {
 	background-color: #EEEEEE;
 }
@@ -227,4 +231,10 @@ div.more_link {
 ul.addons_tagcloud {
 	margin-top: 10px;
 	margin-bottom: 10px;
+}
+
+div.addons_activity_chart {
+	width: 600px;
+	height: 170px;
+	margin: 30px auto;
 }
