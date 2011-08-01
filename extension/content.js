@@ -339,7 +339,7 @@ function updateSingleTrackData(trackId, el) {
 				var userLink = $("<a />").attr("href", "javascript:void(0);").attr("title", "User chart data");
 				userLink.append($("<img />").css("border", "0px").attr("src", chrome.extension.getURL("user-link.png")));
 				userLink.click(function() {
-					charts.user_artists(trackInfo.user, 0);
+					charts.user_activity(trackInfo.user, 0);
 					showCharts();
 				});
 				trackDataEl.append(userLink);
@@ -560,6 +560,7 @@ function init() {
 	$("head").append('<link href="'+ chrome.extension.getURL("content.css") +'?time='+ (new Date()).getTime() +'" rel="stylesheet" type="text/css" />');
 	$("head").append('<script src="'+ chrome.extension.getURL("jquery.tagcloud.min.js") +'" type="text/javascript" ></script>');
 	$("head").append('<script src="'+ chrome.extension.getURL("jquery.tinysort.min.js") +'" type="text/javascript" ></script>');
+	$("head").append('<script src="'+ chrome.extension.getURL("jquery.flot.min.js") +'" type="text/javascript" ></script>');
 	$("body").append("<div id=\"addons\"></div>");
 	chrome.extension.sendRequest({type: "gethtml", url:"popups.html"}, function(response) {
 		$("#addons").html(response);

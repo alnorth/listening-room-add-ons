@@ -125,6 +125,66 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	}
 	this.allUsers = allUsers;
 	
+	function user_activity(username, page) {
+		menu("users", username, "activity", [username, 0]);
+		
+		$("#" + tableDivId).empty();
+		
+		var dayOfWeek = $("<div />").addClass("addons_activity_chart");
+		$("#" + tableDivId).append(dayOfWeek);
+		
+		var hourOfDay = $("<div />").addClass("addons_activity_chart");
+		$("#" + tableDivId).append(hourOfDay);
+		
+		$("#" + tableDivId).hide();
+		$("#" + loaderDivId).show();
+		
+		apiCall("user", {type: "activity_day_of_week", username: username}, 0, function(data) {
+			var plotData = {data: [], color: "#333"},
+				i,
+				weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+			for(i = 0; i < data.length; i++) {
+				plotData.data[i] = [data[i].day_of_week, data[i].plays];
+			}
+			
+			$.plot(dayOfWeek, [plotData], {
+				bars: {show: true, barWidth: 0.5, fill: 0.8, align: "center"},
+				xaxis: {
+					tickFormatter: function formatter(val, axis) {
+						return weekDays[val];
+					},
+					min: -0.5,
+					max: 6.5
+				},
+				yaxis: {show: false}
+			});
+			
+			$("#" + tableDivId).show();
+			$("#" + loaderDivId).hide();
+		});
+		
+		apiCall("user", {type: "activity_hour", username: username}, 0, function(data) {
+			var plotData = {data: [], color: "#333"},
+				i;
+			for(i = 0; i < data.length; i++) {
+				plotData.data[i] = [data[i].hour, data[i].plays];
+			}
+			
+			$.plot(hourOfDay, [plotData], {
+				bars: {show: true, barWidth: 0.5, fill: 0.8, align: "center"},
+				xaxis: {
+					min: -0.5,
+					max: 23.5
+				},
+				yaxis: {show: false}
+			});
+			
+			$("#" + tableDivId).show();
+			$("#" + loaderDivId).hide();
+		});
+	}
+	this.user_activity = user_activity;
+	
 	function user_artists(username, page) {
 		menu("users", username, "artists", [username, 0]);
 		loadAndRender("user", {type: "artists", username: username}, page, colProfiles.artists, {}, function() {
@@ -194,7 +254,7 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 		case "t":
 			return function() {track_users(getValWithFallback(dataRow, "track_title", altValues), getValWithFallback(dataRow, "artist_name", altValues), 0);};
 		case "u":
-			return function() {user_artists(getValWithFallback(dataRow, "username", altValues), 0);};
+			return function() {user_activity(getValWithFallback(dataRow, "username", altValues), 0);};
 		}
 	}
 	
@@ -295,6 +355,7 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 			{title: "Plays", id: "plays", func: artist_plays}
 		],
 		users: [
+			{title: "Activity", id: "activity", func: user_activity},
 			{title: "Artists", id: "artists", func: user_artists},
 			{title: "Tracks", id: "tracks", func: user_tracks},
 			{title: "Tags", id: "tags", func: user_tags},

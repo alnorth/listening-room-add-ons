@@ -64,7 +64,9 @@
 		}
 		
 		function setNowPlaying(track) {
-			if(settings.get("scrobble") && lfm.signedIn() && track.title && track.artist) {
+			var scrobble = settings.get("scrobble") && lfm.signedIn() && (!settings.get("onlyscrobbleowntracks") || track.reportedByUserId === track.userId);
+			
+			if(scrobble && track.title && track.artist) {
 				lfm.setNowPlaying(track.artist, track.title, track.album, track.length, lastfmError);
 				db.saveLastFmStatus(track.id, lastfmStatus.PLAYING_SENT, sqlError, ignore);
 			}
