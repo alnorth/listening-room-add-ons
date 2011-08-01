@@ -65,6 +65,12 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	}
 	this.track_users = track_users;
 	
+	function track_tags(trackTitle, artistName, page) {
+		menu("tracks", trackTitleEl(trackTitle, artistName), "tags", [trackTitle, artistName, 0]);
+		tagCloud("track", {type: "tags", artist_name: artistName, track_title: trackTitle, limit: 60});
+	}
+	this.track_tags = track_tags;
+	
 	function track_plays(trackTitle, artistName, page) {
 		menu("tracks", trackTitleEl(trackTitle, artistName), "plays", [trackTitle, artistName, 0]);
 		loadAndRender("track", {type: "all_plays", artist_name: artistName, track_title: trackTitle}, page, colProfiles.user_play, {}, function() {
@@ -96,6 +102,12 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 		});
 	}
 	this.artist_users = artist_users;
+	
+	function artist_tags(artistName, page) {
+		menu("artists", artistName, "tags", [artistName, 0]);
+		tagCloud("artist", {type: "tags", artist_name: artistName, limit: 60});
+	}
+	this.artist_tags = artist_tags;
 	
 	function artist_plays(artistName, page) {
 		menu("artists", artistName, "plays", [artistName, 0]);
@@ -131,7 +143,7 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	
 	function user_tags(username, page) {
 		menu("users", username, "tags", [username, 0]);
-		tagCloud(username);
+		tagCloud("user", {type: "tags", username: username, limit: 60});
 	}
 	this.user_tags = user_tags;
 	
@@ -273,11 +285,13 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 	var secondLevelMenus = {
 		tracks: [
 			{title: "Users", id: "users", func: track_users},
+			{title: "Tags", id: "tags", func: track_tags},
 			{title: "Plays", id: "plays", func: track_plays}
 		],
 		artists: [
 			{title: "Tracks", id: "tracks", func: artist_tracks},
 			{title: "Users", id: "users", func: artist_users},
+			{title: "Tags", id: "tags", func: artist_tags},
 			{title: "Plays", id: "plays", func: artist_plays}
 		],
 		users: [
@@ -330,14 +344,14 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 		}
 	}
 
-	function tagCloud(username) {
+	function tagCloud(pageName, extraParams) {
 		var div = $("#" + tableDivId);
 		div.empty();
 		
 		$("#" + tableDivId).hide();
 		$("#" + loaderDivId).show();
 		
-		apiCall("user", {type: "tags", username: username, limit: 60}, 0, function(data) {
+		apiCall(pageName, extraParams, 0, function(data) {
 			var ul = $("<ul />").addClass("addons_tagcloud"),
 				i;
 			
