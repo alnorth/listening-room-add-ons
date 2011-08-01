@@ -364,7 +364,7 @@ function Charts(room, lrdata, menuDivId, tableDivId, loaderDivId) {
 			$("#" + tableDivId).show();
 			$("#" + loaderDivId).hide();
 			
-			ul.tagcloud({colormin: "AAA", colormax: "111", type: "sphere", power: 0.3});
+			ul.tagcloud({colormin: "AAA", colormax: "111", type: "sphere", power: 0.3, height:170});
 		});
 	}
 }
